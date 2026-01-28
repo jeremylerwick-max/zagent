@@ -1,12 +1,12 @@
-import type { MoltbotConfig } from "../config/config.js";
+import type { ZAgentConfig } from "../config/config.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 
 export type PluginInstallUpdate = PluginInstallRecord & { pluginId: string };
 
 export function recordPluginInstall(
-  cfg: MoltbotConfig,
+  cfg: ZAgentConfig,
   update: PluginInstallUpdate,
-): MoltbotConfig {
+): ZAgentConfig {
   const { pluginId, ...record } = update;
   const installs = {
     ...cfg.plugins?.installs,

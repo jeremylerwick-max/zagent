@@ -15,30 +15,30 @@ type CommandOptions = Record<string, unknown>;
 
 const SANDBOX_EXAMPLES = {
   main: [
-    ["moltbot sandbox list", "List all sandbox containers."],
-    ["moltbot sandbox list --browser", "List only browser containers."],
-    ["moltbot sandbox recreate --all", "Recreate all containers."],
-    ["moltbot sandbox recreate --session main", "Recreate a specific session."],
-    ["moltbot sandbox recreate --agent mybot", "Recreate agent containers."],
-    ["moltbot sandbox explain", "Explain effective sandbox config."],
+    ["zagent sandbox list", "List all sandbox containers."],
+    ["zagent sandbox list --browser", "List only browser containers."],
+    ["zagent sandbox recreate --all", "Recreate all containers."],
+    ["zagent sandbox recreate --session main", "Recreate a specific session."],
+    ["zagent sandbox recreate --agent mybot", "Recreate agent containers."],
+    ["zagent sandbox explain", "Explain effective sandbox config."],
   ],
   list: [
-    ["moltbot sandbox list", "List all sandbox containers."],
-    ["moltbot sandbox list --browser", "List only browser containers."],
-    ["moltbot sandbox list --json", "JSON output."],
+    ["zagent sandbox list", "List all sandbox containers."],
+    ["zagent sandbox list --browser", "List only browser containers."],
+    ["zagent sandbox list --json", "JSON output."],
   ],
   recreate: [
-    ["moltbot sandbox recreate --all", "Recreate all containers."],
-    ["moltbot sandbox recreate --session main", "Recreate a specific session."],
-    ["moltbot sandbox recreate --agent mybot", "Recreate a specific agent (includes sub-agents)."],
-    ["moltbot sandbox recreate --browser --all", "Recreate only browser containers."],
-    ["moltbot sandbox recreate --all --force", "Skip confirmation."],
+    ["zagent sandbox recreate --all", "Recreate all containers."],
+    ["zagent sandbox recreate --session main", "Recreate a specific session."],
+    ["zagent sandbox recreate --agent mybot", "Recreate a specific agent (includes sub-agents)."],
+    ["zagent sandbox recreate --browser --all", "Recreate only browser containers."],
+    ["zagent sandbox recreate --all --force", "Skip confirmation."],
   ],
   explain: [
-    ["moltbot sandbox explain", "Show effective sandbox config."],
-    ["moltbot sandbox explain --session agent:main:main", "Explain a specific session."],
-    ["moltbot sandbox explain --agent work", "Explain an agent sandbox."],
-    ["moltbot sandbox explain --json", "JSON output."],
+    ["zagent sandbox explain", "Show effective sandbox config."],
+    ["zagent sandbox explain --session agent:main:main", "Explain a specific session."],
+    ["zagent sandbox explain --agent work", "Explain an agent sandbox."],
+    ["zagent sandbox explain --json", "JSON output."],
   ],
 } as const;
 

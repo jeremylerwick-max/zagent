@@ -1,12 +1,12 @@
-import type { MoltbotConfig, WizardPrompter } from "clawdbot/plugin-sdk";
-import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "clawdbot/plugin-sdk";
+import type { ZAgentConfig, WizardPrompter } from "zagent/plugin-sdk";
+import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "zagent/plugin-sdk";
 
 type PromptAccountIdParams = {
-  cfg: MoltbotConfig;
+  cfg: ZAgentConfig;
   prompter: WizardPrompter;
   label: string;
   currentId?: string;
-  listAccountIds: (cfg: MoltbotConfig) => string[];
+  listAccountIds: (cfg: ZAgentConfig) => string[];
   defaultAccountId: string;
 };
 

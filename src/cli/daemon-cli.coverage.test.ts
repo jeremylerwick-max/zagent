@@ -81,36 +81,36 @@ vi.mock("./progress.js", () => ({
 
 describe("daemon-cli coverage", () => {
   const originalEnv = {
-    CLAWDBOT_STATE_DIR: process.env.CLAWDBOT_STATE_DIR,
-    CLAWDBOT_CONFIG_PATH: process.env.CLAWDBOT_CONFIG_PATH,
-    CLAWDBOT_GATEWAY_PORT: process.env.CLAWDBOT_GATEWAY_PORT,
-    CLAWDBOT_PROFILE: process.env.CLAWDBOT_PROFILE,
+    ZAGENT_STATE_DIR: process.env.ZAGENT_STATE_DIR,
+    ZAGENT_CONFIG_PATH: process.env.ZAGENT_CONFIG_PATH,
+    ZAGENT_GATEWAY_PORT: process.env.ZAGENT_GATEWAY_PORT,
+    ZAGENT_PROFILE: process.env.ZAGENT_PROFILE,
   };
 
   beforeEach(() => {
-    process.env.CLAWDBOT_STATE_DIR = "/tmp/moltbot-cli-state";
-    process.env.CLAWDBOT_CONFIG_PATH = "/tmp/moltbot-cli-state/moltbot.json";
-    delete process.env.CLAWDBOT_GATEWAY_PORT;
-    delete process.env.CLAWDBOT_PROFILE;
+    process.env.ZAGENT_STATE_DIR = "/tmp/zagent-cli-state";
+    process.env.ZAGENT_CONFIG_PATH = "/tmp/zagent-cli-state/zagent.json";
+    delete process.env.ZAGENT_GATEWAY_PORT;
+    delete process.env.ZAGENT_PROFILE;
     serviceReadCommand.mockResolvedValue(null);
   });
 
   afterEach(() => {
-    if (originalEnv.CLAWDBOT_STATE_DIR !== undefined)
-      process.env.CLAWDBOT_STATE_DIR = originalEnv.CLAWDBOT_STATE_DIR;
-    else delete process.env.CLAWDBOT_STATE_DIR;
+    if (originalEnv.ZAGENT_STATE_DIR !== undefined)
+      process.env.ZAGENT_STATE_DIR = originalEnv.ZAGENT_STATE_DIR;
+    else delete process.env.ZAGENT_STATE_DIR;
 
-    if (originalEnv.CLAWDBOT_CONFIG_PATH !== undefined)
-      process.env.CLAWDBOT_CONFIG_PATH = originalEnv.CLAWDBOT_CONFIG_PATH;
-    else delete process.env.CLAWDBOT_CONFIG_PATH;
+    if (originalEnv.ZAGENT_CONFIG_PATH !== undefined)
+      process.env.ZAGENT_CONFIG_PATH = originalEnv.ZAGENT_CONFIG_PATH;
+    else delete process.env.ZAGENT_CONFIG_PATH;
 
-    if (originalEnv.CLAWDBOT_GATEWAY_PORT !== undefined)
-      process.env.CLAWDBOT_GATEWAY_PORT = originalEnv.CLAWDBOT_GATEWAY_PORT;
-    else delete process.env.CLAWDBOT_GATEWAY_PORT;
+    if (originalEnv.ZAGENT_GATEWAY_PORT !== undefined)
+      process.env.ZAGENT_GATEWAY_PORT = originalEnv.ZAGENT_GATEWAY_PORT;
+    else delete process.env.ZAGENT_GATEWAY_PORT;
 
-    if (originalEnv.CLAWDBOT_PROFILE !== undefined)
-      process.env.CLAWDBOT_PROFILE = originalEnv.CLAWDBOT_PROFILE;
-    else delete process.env.CLAWDBOT_PROFILE;
+    if (originalEnv.ZAGENT_PROFILE !== undefined)
+      process.env.ZAGENT_PROFILE = originalEnv.ZAGENT_PROFILE;
+    else delete process.env.ZAGENT_PROFILE;
   });
 
   it("probes gateway status by default", async () => {
@@ -140,10 +140,10 @@ describe("daemon-cli coverage", () => {
     serviceReadCommand.mockResolvedValueOnce({
       programArguments: ["/bin/node", "cli", "gateway", "--port", "19001"],
       environment: {
-        CLAWDBOT_PROFILE: "dev",
-        CLAWDBOT_STATE_DIR: "/tmp/moltbot-daemon-state",
-        CLAWDBOT_CONFIG_PATH: "/tmp/moltbot-daemon-state/moltbot.json",
-        CLAWDBOT_GATEWAY_PORT: "19001",
+        ZAGENT_PROFILE: "dev",
+        ZAGENT_STATE_DIR: "/tmp/zagent-daemon-state",
+        ZAGENT_CONFIG_PATH: "/tmp/zagent-daemon-state/zagent.json",
+        ZAGENT_GATEWAY_PORT: "19001",
       },
       sourcePath: "/tmp/bot.molt.gateway.plist",
     });

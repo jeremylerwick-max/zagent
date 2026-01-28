@@ -3,30 +3,30 @@ set -euo pipefail
 
 cd /repo
 
-export CLAWDBOT_STATE_DIR="/tmp/moltbot-test"
-export CLAWDBOT_CONFIG_PATH="${CLAWDBOT_STATE_DIR}/moltbot.json"
+export ZAGENT_STATE_DIR="/tmp/zagent-test"
+export ZAGENT_CONFIG_PATH="${ZAGENT_STATE_DIR}/zagent.json"
 
 echo "==> Seed state"
-mkdir -p "${CLAWDBOT_STATE_DIR}/credentials"
-mkdir -p "${CLAWDBOT_STATE_DIR}/agents/main/sessions"
-echo '{}' >"${CLAWDBOT_CONFIG_PATH}"
-echo 'creds' >"${CLAWDBOT_STATE_DIR}/credentials/marker.txt"
-echo 'session' >"${CLAWDBOT_STATE_DIR}/agents/main/sessions/sessions.json"
+mkdir -p "${ZAGENT_STATE_DIR}/credentials"
+mkdir -p "${ZAGENT_STATE_DIR}/agents/main/sessions"
+echo '{}' >"${ZAGENT_CONFIG_PATH}"
+echo 'creds' >"${ZAGENT_STATE_DIR}/credentials/marker.txt"
+echo 'session' >"${ZAGENT_STATE_DIR}/agents/main/sessions/sessions.json"
 
 echo "==> Reset (config+creds+sessions)"
-pnpm moltbot reset --scope config+creds+sessions --yes --non-interactive
+pnpm zagent reset --scope config+creds+sessions --yes --non-interactive
 
-test ! -f "${CLAWDBOT_CONFIG_PATH}"
-test ! -d "${CLAWDBOT_STATE_DIR}/credentials"
-test ! -d "${CLAWDBOT_STATE_DIR}/agents/main/sessions"
+test ! -f "${ZAGENT_CONFIG_PATH}"
+test ! -d "${ZAGENT_STATE_DIR}/credentials"
+test ! -d "${ZAGENT_STATE_DIR}/agents/main/sessions"
 
 echo "==> Recreate minimal config"
-mkdir -p "${CLAWDBOT_STATE_DIR}/credentials"
-echo '{}' >"${CLAWDBOT_CONFIG_PATH}"
+mkdir -p "${ZAGENT_STATE_DIR}/credentials"
+echo '{}' >"${ZAGENT_CONFIG_PATH}"
 
 echo "==> Uninstall (state only)"
-pnpm moltbot uninstall --state --yes --non-interactive
+pnpm zagent uninstall --state --yes --non-interactive
 
-test ! -d "${CLAWDBOT_STATE_DIR}"
+test ! -d "${ZAGENT_STATE_DIR}"
 
 echo "OK"

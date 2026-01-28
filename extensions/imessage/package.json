@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/imessage",
+  "name": "@zagent/imessage",
   "version": "2026.1.27-beta.1",
   "type": "module",
-  "description": "Moltbot iMessage channel plugin",
-  "moltbot": {
+  "description": "ZAgent iMessage channel plugin",
+  "zagent": {
     "extensions": [
       "./index.ts"
     ]

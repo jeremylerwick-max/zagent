@@ -4,9 +4,9 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPOSE_FILE="$ROOT_DIR/docker-compose.yml"
 EXTRA_COMPOSE_FILE="$ROOT_DIR/docker-compose.extra.yml"
-IMAGE_NAME="${CLAWDBOT_IMAGE:-moltbot:local}"
-EXTRA_MOUNTS="${CLAWDBOT_EXTRA_MOUNTS:-}"
-HOME_VOLUME_NAME="${CLAWDBOT_HOME_VOLUME:-}"
+IMAGE_NAME="${ZAGENT_IMAGE:-zagent:local}"
+EXTRA_MOUNTS="${ZAGENT_EXTRA_MOUNTS:-}"
+HOME_VOLUME_NAME="${ZAGENT_HOME_VOLUME:-}"
 
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -21,29 +21,29 @@ if ! docker compose version >/dev/null 2>&1; then
   exit 1
 fi
 
-mkdir -p "${CLAWDBOT_CONFIG_DIR:-$HOME/.clawdbot}"
-mkdir -p "${CLAWDBOT_WORKSPACE_DIR:-$HOME/clawd}"
+mkdir -p "${ZAGENT_CONFIG_DIR:-$HOME/.zagent}"
+mkdir -p "${ZAGENT_WORKSPACE_DIR:-$HOME/clawd}"
 
-export CLAWDBOT_CONFIG_DIR="${CLAWDBOT_CONFIG_DIR:-$HOME/.clawdbot}"
-export CLAWDBOT_WORKSPACE_DIR="${CLAWDBOT_WORKSPACE_DIR:-$HOME/clawd}"
-export CLAWDBOT_GATEWAY_PORT="${CLAWDBOT_GATEWAY_PORT:-18789}"
-export CLAWDBOT_BRIDGE_PORT="${CLAWDBOT_BRIDGE_PORT:-18790}"
-export CLAWDBOT_GATEWAY_BIND="${CLAWDBOT_GATEWAY_BIND:-lan}"
-export CLAWDBOT_IMAGE="$IMAGE_NAME"
-export CLAWDBOT_DOCKER_APT_PACKAGES="${CLAWDBOT_DOCKER_APT_PACKAGES:-}"
+export ZAGENT_CONFIG_DIR="${ZAGENT_CONFIG_DIR:-$HOME/.zagent}"
+export ZAGENT_WORKSPACE_DIR="${ZAGENT_WORKSPACE_DIR:-$HOME/clawd}"
+export ZAGENT_GATEWAY_PORT="${ZAGENT_GATEWAY_PORT:-18789}"
+export ZAGENT_BRIDGE_PORT="${ZAGENT_BRIDGE_PORT:-18790}"
+export ZAGENT_GATEWAY_BIND="${ZAGENT_GATEWAY_BIND:-lan}"
+export ZAGENT_IMAGE="$IMAGE_NAME"
+export ZAGENT_DOCKER_APT_PACKAGES="${ZAGENT_DOCKER_APT_PACKAGES:-}"
 
-if [[ -z "${CLAWDBOT_GATEWAY_TOKEN:-}" ]]; then
+if [[ -z "${ZAGENT_GATEWAY_TOKEN:-}" ]]; then
   if command -v openssl >/dev/null 2>&1; then
-    CLAWDBOT_GATEWAY_TOKEN="$(openssl rand -hex 32)"
+    ZAGENT_GATEWAY_TOKEN="$(openssl rand -hex 32)"
   else
-    CLAWDBOT_GATEWAY_TOKEN="$(python3 - <<'PY'
+    ZAGENT_GATEWAY_TOKEN="$(python3 - <<'PY'
 import secrets
 print(secrets.token_hex(32))
 PY
 )"
   fi
 fi
-export CLAWDBOT_GATEWAY_TOKEN
+export ZAGENT_GATEWAY_TOKEN
 
 COMPOSE_FILES=("$COMPOSE_FILE")
 COMPOSE_ARGS=()
@@ -56,14 +56,14 @@ write_extra_compose() {
 
   cat >"$EXTRA_COMPOSE_FILE" <<'YAML'
 services:
-  moltbot-gateway:
+  zagent-gateway:
     volumes:
 YAML
 
   if [[ -n "$home_volume" ]]; then
     printf '      - %s:/home/node\n' "$home_volume" >>"$EXTRA_COMPOSE_FILE"
-    printf '      - %s:/home/node/.clawdbot\n' "$CLAWDBOT_CONFIG_DIR" >>"$EXTRA_COMPOSE_FILE"
-    printf '      - %s:/home/node/clawd\n' "$CLAWDBOT_WORKSPACE_DIR" >>"$EXTRA_COMPOSE_FILE"
+    printf '      - %s:/home/node/.zagent\n' "$ZAGENT_CONFIG_DIR" >>"$EXTRA_COMPOSE_FILE"
+    printf '      - %s:/home/node/clawd\n' "$ZAGENT_WORKSPACE_DIR" >>"$EXTRA_COMPOSE_FILE"
   fi
 
   for mount in "${mounts[@]}"; do
@@ -71,14 +71,14 @@ YAML
   done
 
   cat >>"$EXTRA_COMPOSE_FILE" <<'YAML'
-  moltbot-cli:
+  zagent-cli:
     volumes:
 YAML
 
   if [[ -n "$home_volume" ]]; then
     printf '      - %s:/home/node\n' "$home_volume" >>"$EXTRA_COMPOSE_FILE"
-    printf '      - %s:/home/node/.clawdbot\n' "$CLAWDBOT_CONFIG_DIR" >>"$EXTRA_COMPOSE_FILE"
-    printf '      - %s:/home/node/clawd\n' "$CLAWDBOT_WORKSPACE_DIR" >>"$EXTRA_COMPOSE_FILE"
+    printf '      - %s:/home/node/.zagent\n' "$ZAGENT_CONFIG_DIR" >>"$EXTRA_COMPOSE_FILE"
+    printf '      - %s:/home/node/clawd\n' "$ZAGENT_WORKSPACE_DIR" >>"$EXTRA_COMPOSE_FILE"
   fi
 
   for mount in "${mounts[@]}"; do
@@ -154,20 +154,20 @@ upsert_env() {
 }
 
 upsert_env "$ENV_FILE" \
-  CLAWDBOT_CONFIG_DIR \
-  CLAWDBOT_WORKSPACE_DIR \
-  CLAWDBOT_GATEWAY_PORT \
-  CLAWDBOT_BRIDGE_PORT \
-  CLAWDBOT_GATEWAY_BIND \
-  CLAWDBOT_GATEWAY_TOKEN \
-  CLAWDBOT_IMAGE \
-  CLAWDBOT_EXTRA_MOUNTS \
-  CLAWDBOT_HOME_VOLUME \
-  CLAWDBOT_DOCKER_APT_PACKAGES
+  ZAGENT_CONFIG_DIR \
+  ZAGENT_WORKSPACE_DIR \
+  ZAGENT_GATEWAY_PORT \
+  ZAGENT_BRIDGE_PORT \
+  ZAGENT_GATEWAY_BIND \
+  ZAGENT_GATEWAY_TOKEN \
+  ZAGENT_IMAGE \
+  ZAGENT_EXTRA_MOUNTS \
+  ZAGENT_HOME_VOLUME \
+  ZAGENT_DOCKER_APT_PACKAGES
 
 echo "==> Building Docker image: $IMAGE_NAME"
 docker build \
-  --build-arg "CLAWDBOT_DOCKER_APT_PACKAGES=${CLAWDBOT_DOCKER_APT_PACKAGES}" \
+  --build-arg "ZAGENT_DOCKER_APT_PACKAGES=${ZAGENT_DOCKER_APT_PACKAGES}" \
   -t "$IMAGE_NAME" \
   -f "$ROOT_DIR/Dockerfile" \
   "$ROOT_DIR"
@@ -177,33 +177,33 @@ echo "==> Onboarding (interactive)"
 echo "When prompted:"
 echo "  - Gateway bind: lan"
 echo "  - Gateway auth: token"
-echo "  - Gateway token: $CLAWDBOT_GATEWAY_TOKEN"
+echo "  - Gateway token: $ZAGENT_GATEWAY_TOKEN"
 echo "  - Tailscale exposure: Off"
 echo "  - Install Gateway daemon: No"
 echo ""
-docker compose "${COMPOSE_ARGS[@]}" run --rm moltbot-cli onboard --no-install-daemon
+docker compose "${COMPOSE_ARGS[@]}" run --rm zagent-cli onboard --no-install-daemon
 
 echo ""
 echo "==> Provider setup (optional)"
 echo "WhatsApp (QR):"
-echo "  ${COMPOSE_HINT} run --rm moltbot-cli providers login"
+echo "  ${COMPOSE_HINT} run --rm zagent-cli providers login"
 echo "Telegram (bot token):"
-echo "  ${COMPOSE_HINT} run --rm moltbot-cli providers add --provider telegram --token <token>"
+echo "  ${COMPOSE_HINT} run --rm zagent-cli providers add --provider telegram --token <token>"
 echo "Discord (bot token):"
-echo "  ${COMPOSE_HINT} run --rm moltbot-cli providers add --provider discord --token <token>"
+echo "  ${COMPOSE_HINT} run --rm zagent-cli providers add --provider discord --token <token>"
 echo "Docs: https://docs.molt.bot/providers"
 
 echo ""
 echo "==> Starting gateway"
-docker compose "${COMPOSE_ARGS[@]}" up -d moltbot-gateway
+docker compose "${COMPOSE_ARGS[@]}" up -d zagent-gateway
 
 echo ""
 echo "Gateway running with host port mapping."
 echo "Access from tailnet devices via the host's tailnet IP."
-echo "Config: $CLAWDBOT_CONFIG_DIR"
-echo "Workspace: $CLAWDBOT_WORKSPACE_DIR"
-echo "Token: $CLAWDBOT_GATEWAY_TOKEN"
+echo "Config: $ZAGENT_CONFIG_DIR"
+echo "Workspace: $ZAGENT_WORKSPACE_DIR"
+echo "Token: $ZAGENT_GATEWAY_TOKEN"
 echo ""
 echo "Commands:"
-echo "  ${COMPOSE_HINT} logs -f moltbot-gateway"
-echo "  ${COMPOSE_HINT} exec moltbot-gateway node dist/index.js health --token \"$CLAWDBOT_GATEWAY_TOKEN\""
+echo "  ${COMPOSE_HINT} logs -f zagent-gateway"
+echo "  ${COMPOSE_HINT} exec zagent-gateway node dist/index.js health --token \"$ZAGENT_GATEWAY_TOKEN\""

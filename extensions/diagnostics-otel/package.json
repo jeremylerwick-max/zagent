@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/diagnostics-otel",
+  "name": "@zagent/diagnostics-otel",
   "version": "2026.1.27-beta.1",
   "type": "module",
-  "description": "Moltbot diagnostics OpenTelemetry exporter",
-  "moltbot": {
+  "description": "ZAgent diagnostics OpenTelemetry exporter",
+  "zagent": {
     "extensions": [
       "./index.ts"
     ]

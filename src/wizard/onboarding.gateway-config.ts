@@ -1,6 +1,6 @@
 import { randomToken } from "../commands/onboard-helpers.js";
 import type { GatewayAuthChoice } from "../commands/onboard-types.js";
-import type { MoltbotConfig } from "../config/config.js";
+import type { ZAgentConfig } from "../config/config.js";
 import { findTailscaleBinary } from "../infra/tailscale.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type {
@@ -12,8 +12,8 @@ import type { WizardPrompter } from "./prompts.js";
 
 type ConfigureGatewayOptions = {
   flow: WizardFlow;
-  baseConfig: MoltbotConfig;
-  nextConfig: MoltbotConfig;
+  baseConfig: ZAgentConfig;
+  nextConfig: ZAgentConfig;
   localPort: number;
   quickstartGateway: QuickstartGatewayDefaults;
   prompter: WizardPrompter;
@@ -21,7 +21,7 @@ type ConfigureGatewayOptions = {
 };
 
 type ConfigureGatewayResult = {
-  nextConfig: MoltbotConfig;
+  nextConfig: ZAgentConfig;
   settings: GatewayWizardSettings;
 };
 

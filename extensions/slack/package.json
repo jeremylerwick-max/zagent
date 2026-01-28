@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/slack",
+  "name": "@zagent/slack",
   "version": "2026.1.27-beta.1",
   "type": "module",
-  "description": "Moltbot Slack channel plugin",
-  "moltbot": {
+  "description": "ZAgent Slack channel plugin",
+  "zagent": {
     "extensions": [
       "./index.ts"
     ]

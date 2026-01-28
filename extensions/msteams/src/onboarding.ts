@@ -1,16 +1,16 @@
 import type {
   ChannelOnboardingAdapter,
   ChannelOnboardingDmPolicy,
-  MoltbotConfig,
+  ZAgentConfig,
   DmPolicy,
   WizardPrompter,
-} from "clawdbot/plugin-sdk";
+} from "zagent/plugin-sdk";
 import {
   addWildcardAllowFrom,
   DEFAULT_ACCOUNT_ID,
   formatDocsLink,
   promptChannelAccessConfig,
-} from "clawdbot/plugin-sdk";
+} from "zagent/plugin-sdk";
 
 import { resolveMSTeamsCredentials } from "./token.js";
 import {
@@ -21,7 +21,7 @@ import {
 
 const channel = "msteams" as const;
 
-function setMSTeamsDmPolicy(cfg: MoltbotConfig, dmPolicy: DmPolicy) {
+function setMSTeamsDmPolicy(cfg: ZAgentConfig, dmPolicy: DmPolicy) {
   const allowFrom =
     dmPolicy === "open"
       ? addWildcardAllowFrom(cfg.channels?.msteams?.allowFrom)?.map((entry) => String(entry))
@@ -39,7 +39,7 @@ function setMSTeamsDmPolicy(cfg: MoltbotConfig, dmPolicy: DmPolicy) {
   };
 }
 
-function setMSTeamsAllowFrom(cfg: MoltbotConfig, allowFrom: string[]): MoltbotConfig {
+function setMSTeamsAllowFrom(cfg: ZAgentConfig, allowFrom: string[]): ZAgentConfig {
   return {
     ...cfg,
     channels: {
@@ -64,9 +64,9 @@ function looksLikeGuid(value: string): boolean {
 }
 
 async function promptMSTeamsAllowFrom(params: {
-  cfg: MoltbotConfig;
+  cfg: ZAgentConfig;
   prompter: WizardPrompter;
-}): Promise<MoltbotConfig> {
+}): Promise<ZAgentConfig> {
   const existing = params.cfg.channels?.msteams?.allowFrom ?? [];
   await params.prompter.note(
     [
@@ -144,9 +144,9 @@ async function noteMSTeamsCredentialHelp(prompter: WizardPrompter): Promise<void
 }
 
 function setMSTeamsGroupPolicy(
-  cfg: MoltbotConfig,
+  cfg: ZAgentConfig,
   groupPolicy: "open" | "allowlist" | "disabled",
-): MoltbotConfig {
+): ZAgentConfig {
   return {
     ...cfg,
     channels: {
@@ -161,9 +161,9 @@ function setMSTeamsGroupPolicy(
 }
 
 function setMSTeamsTeamsAllowlist(
-  cfg: MoltbotConfig,
+  cfg: ZAgentConfig,
   entries: Array<{ teamKey: string; channelKey?: string }>,
-): MoltbotConfig {
+): ZAgentConfig {
   const baseTeams = cfg.channels?.msteams?.teams ?? {};
   const teams: Record<string, { channels?: Record<string, unknown> }> = { ...baseTeams };
   for (const entry of entries) {

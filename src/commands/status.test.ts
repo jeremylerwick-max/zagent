@@ -3,15 +3,15 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 let previousProfile: string | undefined;
 
 beforeAll(() => {
-  previousProfile = process.env.CLAWDBOT_PROFILE;
-  process.env.CLAWDBOT_PROFILE = "isolated";
+  previousProfile = process.env.ZAGENT_PROFILE;
+  process.env.ZAGENT_PROFILE = "isolated";
 });
 
 afterAll(() => {
   if (previousProfile === undefined) {
-    delete process.env.CLAWDBOT_PROFILE;
+    delete process.env.ZAGENT_PROFILE;
   } else {
-    process.env.CLAWDBOT_PROFILE = previousProfile;
+    process.env.ZAGENT_PROFILE = previousProfile;
   }
 });
 
@@ -204,8 +204,8 @@ vi.mock("../gateway/call.js", async (importOriginal) => {
 vi.mock("../gateway/session-utils.js", () => ({
   listAgentsForGateway: mocks.listAgentsForGateway,
 }));
-vi.mock("../infra/moltbot-root.js", () => ({
-  resolveMoltbotPackageRoot: vi.fn().mockResolvedValue("/tmp/moltbot"),
+vi.mock("../infra/zagent-root.js", () => ({
+  resolveZAgentPackageRoot: vi.fn().mockResolvedValue("/tmp/zagent"),
 }));
 vi.mock("../infra/os-summary.js", () => ({
   resolveOsSummary: () => ({
@@ -217,11 +217,11 @@ vi.mock("../infra/os-summary.js", () => ({
 }));
 vi.mock("../infra/update-check.js", () => ({
   checkUpdateStatus: vi.fn().mockResolvedValue({
-    root: "/tmp/moltbot",
+    root: "/tmp/zagent",
     installKind: "git",
     packageManager: "pnpm",
     git: {
-      root: "/tmp/moltbot",
+      root: "/tmp/zagent",
       branch: "main",
       upstream: "origin/main",
       dirty: false,
@@ -232,8 +232,8 @@ vi.mock("../infra/update-check.js", () => ({
     deps: {
       manager: "pnpm",
       status: "ok",
-      lockfilePath: "/tmp/moltbot/pnpm-lock.yaml",
-      markerPath: "/tmp/moltbot/node_modules/.modules.yaml",
+      lockfilePath: "/tmp/zagent/pnpm-lock.yaml",
+      markerPath: "/tmp/zagent/node_modules/.modules.yaml",
     },
     registry: { latestVersion: "0.0.0" },
   }),
@@ -310,7 +310,7 @@ describe("statusCommand", () => {
     (runtime.log as vi.Mock).mockClear();
     await statusCommand({}, runtime as never);
     const logs = (runtime.log as vi.Mock).mock.calls.map((c) => String(c[0]));
-    expect(logs.some((l) => l.includes("Moltbot status"))).toBe(true);
+    expect(logs.some((l) => l.includes("ZAgent status"))).toBe(true);
     expect(logs.some((l) => l.includes("Overview"))).toBe(true);
     expect(logs.some((l) => l.includes("Security audit"))).toBe(true);
     expect(logs.some((l) => l.includes("Summary:"))).toBe(true);
@@ -330,17 +330,17 @@ describe("statusCommand", () => {
     expect(
       logs.some(
         (l) =>
-          l.includes("moltbot status --all") ||
-          l.includes("moltbot --profile isolated status --all") ||
-          l.includes("moltbot status --all") ||
-          l.includes("moltbot --profile isolated status --all"),
+          l.includes("zagent status --all") ||
+          l.includes("zagent --profile isolated status --all") ||
+          l.includes("zagent status --all") ||
+          l.includes("zagent --profile isolated status --all"),
       ),
     ).toBe(true);
   });
 
   it("shows gateway auth when reachable", async () => {
-    const prevToken = process.env.CLAWDBOT_GATEWAY_TOKEN;
-    process.env.CLAWDBOT_GATEWAY_TOKEN = "abcd1234";
+    const prevToken = process.env.ZAGENT_GATEWAY_TOKEN;
+    process.env.ZAGENT_GATEWAY_TOKEN = "abcd1234";
     try {
       mocks.probeGateway.mockResolvedValueOnce({
         ok: true,
@@ -358,8 +358,8 @@ describe("statusCommand", () => {
       const logs = (runtime.log as vi.Mock).mock.calls.map((c) => String(c[0]));
       expect(logs.some((l) => l.includes("auth token"))).toBe(true);
     } finally {
-      if (prevToken === undefined) delete process.env.CLAWDBOT_GATEWAY_TOKEN;
-      else process.env.CLAWDBOT_GATEWAY_TOKEN = prevToken;
+      if (prevToken === undefined) delete process.env.ZAGENT_GATEWAY_TOKEN;
+      else process.env.ZAGENT_GATEWAY_TOKEN = prevToken;
     }
   });
 

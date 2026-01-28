@@ -25,7 +25,7 @@ import {
   type ChannelMessageActionAdapter,
   type ChannelPlugin,
   type ResolvedDiscordAccount,
-} from "clawdbot/plugin-sdk";
+} from "zagent/plugin-sdk";
 
 import { getDiscordRuntime } from "./runtime.js";
 

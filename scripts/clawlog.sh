@@ -48,17 +48,17 @@ SHOW_HELP=false
 # Function to show usage
 show_usage() {
     cat << EOF
-clawlog - Moltbot Logging Utility
+clawlog - ZAgent Logging Utility
 
 USAGE:
     clawlog [OPTIONS]
 
 DESCRIPTION:
-    View Moltbot logs with full details (bypasses Apple's privacy redaction).
+    View ZAgent logs with full details (bypasses Apple's privacy redaction).
     Requires sudo access configured for /usr/bin/log command.
 
 LOG FLOW ARCHITECTURE:
-    Moltbot logs flow through the macOS unified log (subsystem: bot.molt).
+    ZAgent logs flow through the macOS unified log (subsystem: bot.molt).
 
 LOG CATEGORIES (examples):
     • voicewake           - Voice wake detection/test harness

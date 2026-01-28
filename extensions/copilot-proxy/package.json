@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/copilot-proxy",
+  "name": "@zagent/copilot-proxy",
   "version": "2026.1.27-beta.1",
   "type": "module",
-  "description": "Moltbot Copilot Proxy provider plugin",
-  "moltbot": {
+  "description": "ZAgent Copilot Proxy provider plugin",
+  "zagent": {
     "extensions": [
       "./index.ts"
     ]

@@ -1,4 +1,4 @@
-# Pre-commit hooks for clawdbot
+# Pre-commit hooks for zagent
 # Install: prek install
 # Run manually: prek run --all-files
 #

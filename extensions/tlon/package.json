@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/tlon",
+  "name": "@zagent/tlon",
   "version": "2026.1.27-beta.1",
   "type": "module",
-  "description": "Moltbot Tlon/Urbit channel plugin",
-  "moltbot": {
+  "description": "ZAgent Tlon/Urbit channel plugin",
+  "zagent": {
     "extensions": [
       "./index.ts"
     ],
@@ -18,7 +18,7 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@moltbot/tlon",
+      "npmSpec": "@zagent/tlon",
       "localPath": "extensions/tlon",
       "defaultChoice": "npm"
     }

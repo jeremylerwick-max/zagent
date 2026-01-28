@@ -39,15 +39,15 @@ export function registerStatusHealthSessionsCommands(program: Command) {
       "after",
       () =>
         `\n${theme.heading("Examples:")}\n${formatHelpExamples([
-          ["moltbot status", "Show channel health + session summary."],
-          ["moltbot status --all", "Full diagnosis (read-only)."],
-          ["moltbot status --json", "Machine-readable output."],
-          ["moltbot status --usage", "Show model provider usage/quota snapshots."],
+          ["zagent status", "Show channel health + session summary."],
+          ["zagent status --all", "Full diagnosis (read-only)."],
+          ["zagent status --json", "Machine-readable output."],
+          ["zagent status --usage", "Show model provider usage/quota snapshots."],
           [
-            "moltbot status --deep",
+            "zagent status --deep",
             "Run channel probes (WA + Telegram + Discord + Slack + Signal).",
           ],
-          ["moltbot status --deep --timeout 5000", "Tighten probe timeout."],
+          ["zagent status --deep --timeout 5000", "Tighten probe timeout."],
         ])}`,
     )
     .addHelpText(
@@ -119,10 +119,10 @@ export function registerStatusHealthSessionsCommands(program: Command) {
       "after",
       () =>
         `\n${theme.heading("Examples:")}\n${formatHelpExamples([
-          ["moltbot sessions", "List all sessions."],
-          ["moltbot sessions --active 120", "Only last 2 hours."],
-          ["moltbot sessions --json", "Machine-readable output."],
-          ["moltbot sessions --store ./tmp/sessions.json", "Use a specific session store."],
+          ["zagent sessions", "List all sessions."],
+          ["zagent sessions --active 120", "Only last 2 hours."],
+          ["zagent sessions --json", "Machine-readable output."],
+          ["zagent sessions --store ./tmp/sessions.json", "Use a specific session store."],
         ])}\n\n${theme.muted(
           "Shows token usage per session when the agent reports it; set agents.defaults.contextTokens to see % of your model window.",
         )}`,

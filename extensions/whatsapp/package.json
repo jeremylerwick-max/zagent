@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/whatsapp",
+  "name": "@zagent/whatsapp",
   "version": "2026.1.27-beta.1",
   "type": "module",
-  "description": "Moltbot WhatsApp channel plugin",
-  "moltbot": {
+  "description": "ZAgent WhatsApp channel plugin",
+  "zagent": {
     "extensions": [
       "./index.ts"
     ]

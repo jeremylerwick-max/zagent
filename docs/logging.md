@@ -8,7 +8,7 @@ read_when:
 
 # Logging
 
-Moltbot logs in two places:
+ZAgent logs in two places:
 
 - **File logs** (JSON lines) written by the Gateway.
 - **Console output** shown in terminals and the Control UI.
@@ -20,16 +20,16 @@ levels and formats.
 
 By default, the Gateway writes a rolling log file under:
 
-`/tmp/moltbot/moltbot-YYYY-MM-DD.log`
+`/tmp/zagent/zagent-YYYY-MM-DD.log`
 
 The date uses the gateway host's local timezone.
 
-You can override this in `~/.clawdbot/moltbot.json`:
+You can override this in `~/.zagent/zagent.json`:
 
 ```json
 {
   "logging": {
-    "file": "/path/to/moltbot.log"
+    "file": "/path/to/zagent.log"
   }
 }
 ```
@@ -41,7 +41,7 @@ You can override this in `~/.clawdbot/moltbot.json`:
 Use the CLI to tail the gateway log file via RPC:
 
 ```bash
-moltbot logs --follow
+zagent logs --follow
 ```
 
 Output modes:
@@ -62,7 +62,7 @@ In JSON mode, the CLI emits `type`-tagged objects:
 If the Gateway is unreachable, the CLI prints a short hint to run:
 
 ```bash
-moltbot doctor
+zagent doctor
 ```
 
 ### Control UI (web)
@@ -75,7 +75,7 @@ See [/web/control-ui](/web/control-ui) for how to open it.
 To filter channel activity (WhatsApp/Telegram/etc), use:
 
 ```bash
-moltbot channels logs --channel whatsapp
+zagent channels logs --channel whatsapp
 ```
 
 ## Log formats
@@ -97,13 +97,13 @@ Console formatting is controlled by `logging.consoleStyle`.
 
 ## Configuring logging
 
-All logging configuration lives under `logging` in `~/.clawdbot/moltbot.json`.
+All logging configuration lives under `logging` in `~/.zagent/zagent.json`.
 
 ```json
 {
   "logging": {
     "level": "info",
-    "file": "/tmp/moltbot/moltbot-YYYY-MM-DD.log",
+    "file": "/tmp/zagent/zagent-YYYY-MM-DD.log",
     "consoleLevel": "info",
     "consoleStyle": "pretty",
     "redactSensitive": "tools",
@@ -151,7 +151,7 @@ diagnostics + the exporter plugin are enabled.
 
 - **OpenTelemetry (OTel)**: the data model + SDKs for traces, metrics, and logs.
 - **OTLP**: the wire protocol used to export OTel data to a collector/backend.
-- Moltbot exports via **OTLP/HTTP (protobuf)** today.
+- ZAgent exports via **OTLP/HTTP (protobuf)** today.
 
 ### Signals exported
 
@@ -208,7 +208,7 @@ Flags are case-insensitive and support wildcards (e.g. `telegram.*` or `*`).
 Env override (one-off):
 
 ```
-CLAWDBOT_DIAGNOSTICS=telegram.http,telegram.payload
+ZAGENT_DIAGNOSTICS=telegram.http,telegram.payload
 ```
 
 Notes:
@@ -237,7 +237,7 @@ works with any OpenTelemetry collector/backend that accepts OTLP/HTTP.
       "enabled": true,
       "endpoint": "http://otel-collector:4318",
       "protocol": "http/protobuf",
-      "serviceName": "moltbot-gateway",
+      "serviceName": "zagent-gateway",
       "traces": true,
       "metrics": true,
       "logs": true,
@@ -249,7 +249,7 @@ works with any OpenTelemetry collector/backend that accepts OTLP/HTTP.
 ```
 
 Notes:
-- You can also enable the plugin with `moltbot plugins enable diagnostics-otel`.
+- You can also enable the plugin with `zagent plugins enable diagnostics-otel`.
 - `protocol` currently supports `http/protobuf` only. `grpc` is ignored.
 - Metrics include token usage, cost, context size, run duration, and message-flow
   counters/histograms (webhooks, queueing, session state, queue depth/wait).
@@ -262,58 +262,58 @@ Notes:
 ### Exported metrics (names + types)
 
 Model usage:
-- `moltbot.tokens` (counter, attrs: `moltbot.token`, `moltbot.channel`,
-  `moltbot.provider`, `moltbot.model`)
-- `moltbot.cost.usd` (counter, attrs: `moltbot.channel`, `moltbot.provider`,
-  `moltbot.model`)
-- `moltbot.run.duration_ms` (histogram, attrs: `moltbot.channel`,
-  `moltbot.provider`, `moltbot.model`)
-- `moltbot.context.tokens` (histogram, attrs: `moltbot.context`,
-  `moltbot.channel`, `moltbot.provider`, `moltbot.model`)
+- `zagent.tokens` (counter, attrs: `zagent.token`, `zagent.channel`,
+  `zagent.provider`, `zagent.model`)
+- `zagent.cost.usd` (counter, attrs: `zagent.channel`, `zagent.provider`,
+  `zagent.model`)
+- `zagent.run.duration_ms` (histogram, attrs: `zagent.channel`,
+  `zagent.provider`, `zagent.model`)
+- `zagent.context.tokens` (histogram, attrs: `zagent.context`,
+  `zagent.channel`, `zagent.provider`, `zagent.model`)
 
 Message flow:
-- `moltbot.webhook.received` (counter, attrs: `moltbot.channel`,
-  `moltbot.webhook`)
-- `moltbot.webhook.error` (counter, attrs: `moltbot.channel`,
-  `moltbot.webhook`)
-- `moltbot.webhook.duration_ms` (histogram, attrs: `moltbot.channel`,
-  `moltbot.webhook`)
-- `moltbot.message.queued` (counter, attrs: `moltbot.channel`,
-  `moltbot.source`)
-- `moltbot.message.processed` (counter, attrs: `moltbot.channel`,
-  `moltbot.outcome`)
-- `moltbot.message.duration_ms` (histogram, attrs: `moltbot.channel`,
-  `moltbot.outcome`)
+- `zagent.webhook.received` (counter, attrs: `zagent.channel`,
+  `zagent.webhook`)
+- `zagent.webhook.error` (counter, attrs: `zagent.channel`,
+  `zagent.webhook`)
+- `zagent.webhook.duration_ms` (histogram, attrs: `zagent.channel`,
+  `zagent.webhook`)
+- `zagent.message.queued` (counter, attrs: `zagent.channel`,
+  `zagent.source`)
+- `zagent.message.processed` (counter, attrs: `zagent.channel`,
+  `zagent.outcome`)
+- `zagent.message.duration_ms` (histogram, attrs: `zagent.channel`,
+  `zagent.outcome`)
 
 Queues + sessions:
-- `moltbot.queue.lane.enqueue` (counter, attrs: `moltbot.lane`)
-- `moltbot.queue.lane.dequeue` (counter, attrs: `moltbot.lane`)
-- `moltbot.queue.depth` (histogram, attrs: `moltbot.lane` or
-  `moltbot.channel=heartbeat`)
-- `moltbot.queue.wait_ms` (histogram, attrs: `moltbot.lane`)
-- `moltbot.session.state` (counter, attrs: `moltbot.state`, `moltbot.reason`)
-- `moltbot.session.stuck` (counter, attrs: `moltbot.state`)
-- `moltbot.session.stuck_age_ms` (histogram, attrs: `moltbot.state`)
-- `moltbot.run.attempt` (counter, attrs: `moltbot.attempt`)
+- `zagent.queue.lane.enqueue` (counter, attrs: `zagent.lane`)
+- `zagent.queue.lane.dequeue` (counter, attrs: `zagent.lane`)
+- `zagent.queue.depth` (histogram, attrs: `zagent.lane` or
+  `zagent.channel=heartbeat`)
+- `zagent.queue.wait_ms` (histogram, attrs: `zagent.lane`)
+- `zagent.session.state` (counter, attrs: `zagent.state`, `zagent.reason`)
+- `zagent.session.stuck` (counter, attrs: `zagent.state`)
+- `zagent.session.stuck_age_ms` (histogram, attrs: `zagent.state`)
+- `zagent.run.attempt` (counter, attrs: `zagent.attempt`)
 
 ### Exported spans (names + key attributes)
 
-- `moltbot.model.usage`
-  - `moltbot.channel`, `moltbot.provider`, `moltbot.model`
-  - `moltbot.sessionKey`, `moltbot.sessionId`
-  - `moltbot.tokens.*` (input/output/cache_read/cache_write/total)
-- `moltbot.webhook.processed`
-  - `moltbot.channel`, `moltbot.webhook`, `moltbot.chatId`
-- `moltbot.webhook.error`
-  - `moltbot.channel`, `moltbot.webhook`, `moltbot.chatId`,
-    `moltbot.error`
-- `moltbot.message.processed`
-  - `moltbot.channel`, `moltbot.outcome`, `moltbot.chatId`,
-    `moltbot.messageId`, `moltbot.sessionKey`, `moltbot.sessionId`,
-    `moltbot.reason`
-- `moltbot.session.stuck`
-  - `moltbot.state`, `moltbot.ageMs`, `moltbot.queueDepth`,
-    `moltbot.sessionKey`, `moltbot.sessionId`
+- `zagent.model.usage`
+  - `zagent.channel`, `zagent.provider`, `zagent.model`
+  - `zagent.sessionKey`, `zagent.sessionId`
+  - `zagent.tokens.*` (input/output/cache_read/cache_write/total)
+- `zagent.webhook.processed`
+  - `zagent.channel`, `zagent.webhook`, `zagent.chatId`
+- `zagent.webhook.error`
+  - `zagent.channel`, `zagent.webhook`, `zagent.chatId`,
+    `zagent.error`
+- `zagent.message.processed`
+  - `zagent.channel`, `zagent.outcome`, `zagent.chatId`,
+    `zagent.messageId`, `zagent.sessionKey`, `zagent.sessionId`,
+    `zagent.reason`
+- `zagent.session.stuck`
+  - `zagent.state`, `zagent.ageMs`, `zagent.queueDepth`,
+    `zagent.sessionKey`, `zagent.sessionId`
 
 ### Sampling + flushing
 
@@ -337,7 +337,7 @@ Queues + sessions:
 
 ## Troubleshooting tips
 
-- **Gateway not reachable?** Run `moltbot doctor` first.
+- **Gateway not reachable?** Run `zagent doctor` first.
 - **Logs empty?** Check that the Gateway is running and writing to the file path
   in `logging.file`.
 - **Need more detail?** Set `logging.level` to `debug` or `trace` and retry.

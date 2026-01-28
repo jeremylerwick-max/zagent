@@ -223,25 +223,25 @@ describe("buildServiceEnvironment", () => {
     } else {
       expect(env.PATH).toContain("/usr/bin");
     }
-    expect(env.CLAWDBOT_GATEWAY_PORT).toBe("18789");
-    expect(env.CLAWDBOT_GATEWAY_TOKEN).toBe("secret");
-    expect(env.CLAWDBOT_SERVICE_MARKER).toBe("moltbot");
-    expect(env.CLAWDBOT_SERVICE_KIND).toBe("gateway");
-    expect(typeof env.CLAWDBOT_SERVICE_VERSION).toBe("string");
-    expect(env.CLAWDBOT_SYSTEMD_UNIT).toBe("moltbot-gateway.service");
+    expect(env.ZAGENT_GATEWAY_PORT).toBe("18789");
+    expect(env.ZAGENT_GATEWAY_TOKEN).toBe("secret");
+    expect(env.ZAGENT_SERVICE_MARKER).toBe("zagent");
+    expect(env.ZAGENT_SERVICE_KIND).toBe("gateway");
+    expect(typeof env.ZAGENT_SERVICE_VERSION).toBe("string");
+    expect(env.ZAGENT_SYSTEMD_UNIT).toBe("zagent-gateway.service");
     if (process.platform === "darwin") {
-      expect(env.CLAWDBOT_LAUNCHD_LABEL).toBe("bot.molt.gateway");
+      expect(env.ZAGENT_LAUNCHD_LABEL).toBe("bot.molt.gateway");
     }
   });
 
   it("uses profile-specific unit and label", () => {
     const env = buildServiceEnvironment({
-      env: { HOME: "/home/user", CLAWDBOT_PROFILE: "work" },
+      env: { HOME: "/home/user", ZAGENT_PROFILE: "work" },
       port: 18789,
     });
-    expect(env.CLAWDBOT_SYSTEMD_UNIT).toBe("moltbot-gateway-work.service");
+    expect(env.ZAGENT_SYSTEMD_UNIT).toBe("zagent-gateway-work.service");
     if (process.platform === "darwin") {
-      expect(env.CLAWDBOT_LAUNCHD_LABEL).toBe("bot.molt.work");
+      expect(env.ZAGENT_LAUNCHD_LABEL).toBe("bot.molt.work");
     }
   });
 });

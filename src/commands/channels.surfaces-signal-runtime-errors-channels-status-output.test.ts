@@ -40,7 +40,7 @@ const runtime: RuntimeEnv = {
 };
 
 const _baseSnapshot = {
-  path: "/tmp/moltbot.json",
+  path: "/tmp/zagent.json",
   exists: true,
   raw: "{}",
   parsed: {},

@@ -1,6 +1,6 @@
-import type { MoltbotConfig } from "./types.js";
+import type { ZAgentConfig } from "./types.js";
 
-export function collectConfigEnvVars(cfg?: MoltbotConfig): Record<string, string> {
+export function collectConfigEnvVars(cfg?: ZAgentConfig): Record<string, string> {
   const envConfig = cfg?.env;
   if (!envConfig) return {};
 

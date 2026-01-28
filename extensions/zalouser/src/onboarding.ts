@@ -1,16 +1,16 @@
 import type {
   ChannelOnboardingAdapter,
   ChannelOnboardingDmPolicy,
-  MoltbotConfig,
+  ZAgentConfig,
   WizardPrompter,
-} from "clawdbot/plugin-sdk";
+} from "zagent/plugin-sdk";
 import {
   addWildcardAllowFrom,
   DEFAULT_ACCOUNT_ID,
   normalizeAccountId,
   promptAccountId,
   promptChannelAccessConfig,
-} from "clawdbot/plugin-sdk";
+} from "zagent/plugin-sdk";
 
 import {
   listZalouserAccountIds,
@@ -24,9 +24,9 @@ import type { ZcaFriend, ZcaGroup } from "./types.js";
 const channel = "zalouser" as const;
 
 function setZalouserDmPolicy(
-  cfg: MoltbotConfig,
+  cfg: ZAgentConfig,
   dmPolicy: "pairing" | "allowlist" | "open" | "disabled",
-): MoltbotConfig {
+): ZAgentConfig {
   const allowFrom =
     dmPolicy === "open"
       ? addWildcardAllowFrom(cfg.channels?.zalouser?.allowFrom)
@@ -41,7 +41,7 @@ function setZalouserDmPolicy(
         ...(allowFrom ? { allowFrom } : {}),
       },
     },
-  } as MoltbotConfig;
+  } as ZAgentConfig;
 }
 
 async function noteZalouserHelp(prompter: WizardPrompter): Promise<void> {
@@ -60,10 +60,10 @@ async function noteZalouserHelp(prompter: WizardPrompter): Promise<void> {
 }
 
 async function promptZalouserAllowFrom(params: {
-  cfg: MoltbotConfig;
+  cfg: ZAgentConfig;
   prompter: WizardPrompter;
   accountId: string;
-}): Promise<MoltbotConfig> {
+}): Promise<ZAgentConfig> {
   const { cfg, prompter, accountId } = params;
   const resolved = resolveZalouserAccountSync({ cfg, accountId });
   const existingAllowFrom = resolved.config.allowFrom ?? [];
@@ -131,7 +131,7 @@ async function promptZalouserAllowFrom(params: {
             allowFrom: unique,
           },
         },
-      } as MoltbotConfig;
+      } as ZAgentConfig;
     }
 
     return {
@@ -152,15 +152,15 @@ async function promptZalouserAllowFrom(params: {
           },
         },
       },
-    } as MoltbotConfig;
+    } as ZAgentConfig;
   }
 }
 
 function setZalouserGroupPolicy(
-  cfg: MoltbotConfig,
+  cfg: ZAgentConfig,
   accountId: string,
   groupPolicy: "open" | "allowlist" | "disabled",
-): MoltbotConfig {
+): ZAgentConfig {
   if (accountId === DEFAULT_ACCOUNT_ID) {
     return {
       ...cfg,
@@ -172,7 +172,7 @@ function setZalouserGroupPolicy(
           groupPolicy,
         },
       },
-    } as MoltbotConfig;
+    } as ZAgentConfig;
   }
   return {
     ...cfg,
@@ -191,14 +191,14 @@ function setZalouserGroupPolicy(
         },
       },
     },
-  } as MoltbotConfig;
+  } as ZAgentConfig;
 }
 
 function setZalouserGroupAllowlist(
-  cfg: MoltbotConfig,
+  cfg: ZAgentConfig,
   accountId: string,
   groupKeys: string[],
-): MoltbotConfig {
+): ZAgentConfig {
   const groups = Object.fromEntries(groupKeys.map((key) => [key, { allow: true }]));
   if (accountId === DEFAULT_ACCOUNT_ID) {
     return {
@@ -211,7 +211,7 @@ function setZalouserGroupAllowlist(
           groups,
         },
       },
-    } as MoltbotConfig;
+    } as ZAgentConfig;
   }
   return {
     ...cfg,
@@ -230,11 +230,11 @@ function setZalouserGroupAllowlist(
         },
       },
     },
-  } as MoltbotConfig;
+  } as ZAgentConfig;
 }
 
 async function resolveZalouserGroups(params: {
-  cfg: MoltbotConfig;
+  cfg: ZAgentConfig;
   accountId: string;
   entries: string[];
 }): Promise<Array<{ input: string; resolved: boolean; id?: string }>> {
@@ -270,15 +270,15 @@ const dmPolicy: ChannelOnboardingDmPolicy = {
   channel,
   policyKey: "channels.zalouser.dmPolicy",
   allowFromKey: "channels.zalouser.allowFrom",
-  getCurrent: (cfg) => ((cfg as MoltbotConfig).channels?.zalouser?.dmPolicy ?? "pairing") as "pairing",
-  setPolicy: (cfg, policy) => setZalouserDmPolicy(cfg as MoltbotConfig, policy),
+  getCurrent: (cfg) => ((cfg as ZAgentConfig).channels?.zalouser?.dmPolicy ?? "pairing") as "pairing",
+  setPolicy: (cfg, policy) => setZalouserDmPolicy(cfg as ZAgentConfig, policy),
   promptAllowFrom: async ({ cfg, prompter, accountId }) => {
     const id =
       accountId && normalizeAccountId(accountId)
         ? normalizeAccountId(accountId) ?? DEFAULT_ACCOUNT_ID
-        : resolveDefaultZalouserAccountId(cfg as MoltbotConfig);
+        : resolveDefaultZalouserAccountId(cfg as ZAgentConfig);
     return promptZalouserAllowFrom({
-      cfg: cfg as MoltbotConfig,
+      cfg: cfg as ZAgentConfig,
       prompter,
       accountId: id,
     });
@@ -289,10 +289,10 @@ export const zalouserOnboardingAdapter: ChannelOnboardingAdapter = {
   channel,
   dmPolicy,
   getStatus: async ({ cfg }) => {
-    const ids = listZalouserAccountIds(cfg as MoltbotConfig);
+    const ids = listZalouserAccountIds(cfg as ZAgentConfig);
     let configured = false;
     for (const accountId of ids) {
-      const account = resolveZalouserAccountSync({ cfg: cfg as MoltbotConfig, accountId });
+      const account = resolveZalouserAccountSync({ cfg: cfg as ZAgentConfig, accountId });
       const isAuth = await checkZcaAuthenticated(account.profile);
       if (isAuth) {
         configured = true;
@@ -324,14 +324,14 @@ export const zalouserOnboardingAdapter: ChannelOnboardingAdapter = {
     }
 
     const zalouserOverride = accountOverrides.zalouser?.trim();
-    const defaultAccountId = resolveDefaultZalouserAccountId(cfg as MoltbotConfig);
+    const defaultAccountId = resolveDefaultZalouserAccountId(cfg as ZAgentConfig);
     let accountId = zalouserOverride
       ? normalizeAccountId(zalouserOverride)
       : defaultAccountId;
 
     if (shouldPromptAccountIds && !zalouserOverride) {
       accountId = await promptAccountId({
-        cfg: cfg as MoltbotConfig,
+        cfg: cfg as ZAgentConfig,
         prompter,
         label: "Zalo Personal",
         currentId: accountId,
@@ -340,7 +340,7 @@ export const zalouserOnboardingAdapter: ChannelOnboardingAdapter = {
       });
     }
 
-    let next = cfg as MoltbotConfig;
+    let next = cfg as ZAgentConfig;
     const account = resolveZalouserAccountSync({ cfg: next, accountId });
     const alreadyAuthenticated = await checkZcaAuthenticated(account.profile);
 
@@ -398,7 +398,7 @@ export const zalouserOnboardingAdapter: ChannelOnboardingAdapter = {
             profile: account.profile !== "default" ? account.profile : undefined,
           },
         },
-      } as MoltbotConfig;
+      } as ZAgentConfig;
     } else {
       next = {
         ...next,
@@ -417,7 +417,7 @@ export const zalouserOnboardingAdapter: ChannelOnboardingAdapter = {
             },
           },
         },
-      } as MoltbotConfig;
+      } as ZAgentConfig;
     }
 
     if (forceAllowFrom) {

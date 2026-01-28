@@ -6,9 +6,9 @@ import { fileURLToPath } from "node:url";
 import { LEGACY_CANVAS_HANDLER_NAME } from "../compat/legacy-names.js";
 import { detectMime } from "../media/mime.js";
 
-export const A2UI_PATH = "/__moltbot__/a2ui";
-export const CANVAS_HOST_PATH = "/__moltbot__/canvas";
-export const CANVAS_WS_PATH = "/__moltbot/ws";
+export const A2UI_PATH = "/__zagent__/a2ui";
+export const CANVAS_HOST_PATH = "/__zagent__/canvas";
+export const CANVAS_WS_PATH = "/__zagent/ws";
 
 let cachedA2uiRootReal: string | null | undefined;
 let resolvingA2uiRoot: Promise<string | null> | null = null;
@@ -100,7 +100,7 @@ export function injectCanvasLiveReload(html: string): string {
   // Works on:
   // - iOS: window.webkit.messageHandlers.(current|legacy)CanvasA2UIAction.postMessage(...)
   // - Android: window.(current|legacy)CanvasA2UIAction.postMessage(...)
-  const handlerNames = ["moltbotCanvasA2UIAction", "${legacyHandlerName}"];
+  const handlerNames = ["zagentCanvasA2UIAction", "${legacyHandlerName}"];
   function postToNode(payload) {
     try {
       const raw = typeof payload === "string" ? payload : JSON.stringify(payload);
@@ -127,13 +127,13 @@ export function injectCanvasLiveReload(html: string): string {
     const action = { ...userAction, id };
     return postToNode({ userAction: action });
   }
-  globalThis.Moltbot = globalThis.Moltbot ?? {};
-  globalThis.Moltbot.postMessage = postToNode;
-  globalThis.Moltbot.sendUserAction = sendUserAction;
-  globalThis.moltbotPostMessage = postToNode;
-  globalThis.moltbotSendUserAction = sendUserAction;
-  globalThis.clawdbotPostMessage = postToNode;
-  globalThis.clawdbotSendUserAction = sendUserAction;
+  globalThis.ZAgent = globalThis.ZAgent ?? {};
+  globalThis.ZAgent.postMessage = postToNode;
+  globalThis.ZAgent.sendUserAction = sendUserAction;
+  globalThis.zagentPostMessage = postToNode;
+  globalThis.zagentSendUserAction = sendUserAction;
+  globalThis.zagentPostMessage = postToNode;
+  globalThis.zagentSendUserAction = sendUserAction;
 
   try {
     const proto = location.protocol === "https:" ? "wss" : "ws";

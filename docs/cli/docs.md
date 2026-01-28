@@ -1,15 +1,15 @@
 ---
-summary: "CLI reference for `moltbot docs` (search the live docs index)"
+summary: "CLI reference for `zagent docs` (search the live docs index)"
 read_when:
-  - You want to search the live Moltbot docs from the terminal
+  - You want to search the live ZAgent docs from the terminal
 ---
 
-# `moltbot docs`
+# `zagent docs`
 
 Search the live docs index.
 
 ```bash
-moltbot docs browser extension
-moltbot docs sandbox allowHostControl
+zagent docs browser extension
+zagent docs sandbox allowHostControl
 ```
 

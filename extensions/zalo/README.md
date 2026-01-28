@@ -1,17 +1,17 @@
-# @clawdbot/zalo
+# @zagent/zalo
 
-Zalo channel plugin for Clawdbot (Bot API).
+Zalo channel plugin for ZAgent (Bot API).
 
 ## Install (local checkout)
 
 ```bash
-clawdbot plugins install ./extensions/zalo
+zagent plugins install ./extensions/zalo
 ```
 
 ## Install (npm)
 
 ```bash
-clawdbot plugins install @clawdbot/zalo
+zagent plugins install @zagent/zalo
 ```
 
 Onboarding: select Zalo and confirm the install prompt to fetch the plugin automatically.

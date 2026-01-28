@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/googlechat",
+  "name": "@zagent/googlechat",
   "version": "2026.1.27-beta.1",
   "type": "module",
-  "description": "Moltbot Google Chat channel plugin",
-  "moltbot": {
+  "description": "ZAgent Google Chat channel plugin",
+  "zagent": {
     "extensions": [
       "./index.ts"
     ],
@@ -22,7 +22,7 @@
       "order": 55
     },
     "install": {
-      "npmSpec": "@moltbot/googlechat",
+      "npmSpec": "@zagent/googlechat",
       "localPath": "extensions/googlechat",
       "defaultChoice": "npm"
     }
@@ -31,9 +31,9 @@
     "google-auth-library": "^10.5.0"
   },
   "devDependencies": {
-    "moltbot": "workspace:*"
+    "zagent": "workspace:*"
   },
   "peerDependencies": {
-    "moltbot": ">=2026.1.26"
+    "zagent": ">=2026.1.26"
   }
 }

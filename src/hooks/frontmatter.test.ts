@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   parseFrontmatter,
-  resolveMoltbotMetadata,
+  resolveZAgentMetadata,
   resolveHookInvocationPolicy,
 } from "./frontmatter.js";
 
@@ -41,7 +41,7 @@ name: session-memory
 description: "Save session context"
 metadata:
   {
-    "moltbot": {
+    "zagent": {
       "emoji": "💾",
       "events": ["command:new"]
     }
@@ -58,8 +58,8 @@ metadata:
 
     // Verify the metadata is valid JSON
     const parsed = JSON.parse(result.metadata as string);
-    expect(parsed.moltbot.emoji).toBe("💾");
-    expect(parsed.moltbot.events).toEqual(["command:new"]);
+    expect(parsed.zagent.emoji).toBe("💾");
+    expect(parsed.zagent.events).toEqual(["command:new"]);
   });
 
   it("parses multi-line metadata with complex nested structure", () => {
@@ -68,7 +68,7 @@ name: command-logger
 description: "Log all command events"
 metadata:
   {
-    "moltbot":
+    "zagent":
       {
         "emoji": "📝",
         "events": ["command"],
@@ -83,21 +83,21 @@ metadata:
     expect(result.metadata).toBeDefined();
 
     const parsed = JSON.parse(result.metadata as string);
-    expect(parsed.moltbot.emoji).toBe("📝");
-    expect(parsed.moltbot.events).toEqual(["command"]);
-    expect(parsed.moltbot.requires.config).toEqual(["workspace.dir"]);
-    expect(parsed.moltbot.install[0].kind).toBe("bundled");
+    expect(parsed.zagent.emoji).toBe("📝");
+    expect(parsed.zagent.events).toEqual(["command"]);
+    expect(parsed.zagent.requires.config).toEqual(["workspace.dir"]);
+    expect(parsed.zagent.install[0].kind).toBe("bundled");
   });
 
   it("handles single-line metadata (inline JSON)", () => {
     const content = `---
 name: simple-hook
-metadata: {"moltbot": {"events": ["test"]}}
+metadata: {"zagent": {"events": ["test"]}}
 ---
 `;
     const result = parseFrontmatter(content);
     expect(result.name).toBe("simple-hook");
-    expect(result.metadata).toBe('{"moltbot": {"events": ["test"]}}');
+    expect(result.metadata).toBe('{"zagent": {"events": ["test"]}}');
   });
 
   it("handles mixed single-line and multi-line values", () => {
@@ -107,7 +107,7 @@ description: "A hook with mixed values"
 homepage: https://example.com
 metadata:
   {
-    "moltbot": {
+    "zagent": {
       "events": ["command:new"]
     }
   }
@@ -148,12 +148,12 @@ description: 'single-quoted'
   });
 });
 
-describe("resolveMoltbotMetadata", () => {
-  it("extracts moltbot metadata from parsed frontmatter", () => {
+describe("resolveZAgentMetadata", () => {
+  it("extracts zagent metadata from parsed frontmatter", () => {
     const frontmatter = {
       name: "test-hook",
       metadata: JSON.stringify({
-        moltbot: {
+        zagent: {
           emoji: "🔥",
           events: ["command:new", "command:reset"],
           requires: {
@@ -164,7 +164,7 @@ describe("resolveMoltbotMetadata", () => {
       }),
     };
 
-    const result = resolveMoltbotMetadata(frontmatter);
+    const result = resolveZAgentMetadata(frontmatter);
     expect(result).toBeDefined();
     expect(result?.emoji).toBe("🔥");
     expect(result?.events).toEqual(["command:new", "command:reset"]);
@@ -174,15 +174,15 @@ describe("resolveMoltbotMetadata", () => {
 
   it("returns undefined when metadata is missing", () => {
     const frontmatter = { name: "no-metadata" };
-    const result = resolveMoltbotMetadata(frontmatter);
+    const result = resolveZAgentMetadata(frontmatter);
     expect(result).toBeUndefined();
   });
 
-  it("returns undefined when moltbot key is missing", () => {
+  it("returns undefined when zagent key is missing", () => {
     const frontmatter = {
       metadata: JSON.stringify({ other: "data" }),
     };
-    const result = resolveMoltbotMetadata(frontmatter);
+    const result = resolveZAgentMetadata(frontmatter);
     expect(result).toBeUndefined();
   });
 
@@ -190,41 +190,41 @@ describe("resolveMoltbotMetadata", () => {
     const frontmatter = {
       metadata: "not valid json {",
     };
-    const result = resolveMoltbotMetadata(frontmatter);
+    const result = resolveZAgentMetadata(frontmatter);
     expect(result).toBeUndefined();
   });
 
   it("handles install specs", () => {
     const frontmatter = {
       metadata: JSON.stringify({
-        moltbot: {
+        zagent: {
           events: ["command"],
           install: [
-            { id: "bundled", kind: "bundled", label: "Bundled with Moltbot" },
-            { id: "npm", kind: "npm", package: "@moltbot/hook" },
+            { id: "bundled", kind: "bundled", label: "Bundled with ZAgent" },
+            { id: "npm", kind: "npm", package: "@zagent/hook" },
           ],
         },
       }),
     };
 
-    const result = resolveMoltbotMetadata(frontmatter);
+    const result = resolveZAgentMetadata(frontmatter);
     expect(result?.install).toHaveLength(2);
     expect(result?.install?.[0].kind).toBe("bundled");
     expect(result?.install?.[1].kind).toBe("npm");
-    expect(result?.install?.[1].package).toBe("@moltbot/hook");
+    expect(result?.install?.[1].package).toBe("@zagent/hook");
   });
 
   it("handles os restrictions", () => {
     const frontmatter = {
       metadata: JSON.stringify({
-        moltbot: {
+        zagent: {
           events: ["command"],
           os: ["darwin", "linux"],
         },
       }),
     };
 
-    const result = resolveMoltbotMetadata(frontmatter);
+    const result = resolveZAgentMetadata(frontmatter);
     expect(result?.os).toEqual(["darwin", "linux"]);
   });
 
@@ -236,12 +236,12 @@ description: "Save session context to memory when /new command is issued"
 homepage: https://docs.molt.bot/hooks#session-memory
 metadata:
   {
-    "moltbot":
+    "zagent":
       {
         "emoji": "💾",
         "events": ["command:new"],
         "requires": { "config": ["workspace.dir"] },
-        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with Moltbot" }],
+        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with ZAgent" }],
       },
   }
 ---
@@ -253,28 +253,28 @@ metadata:
     expect(frontmatter.name).toBe("session-memory");
     expect(frontmatter.metadata).toBeDefined();
 
-    const moltbot = resolveMoltbotMetadata(frontmatter);
-    expect(moltbot).toBeDefined();
-    expect(moltbot?.emoji).toBe("💾");
-    expect(moltbot?.events).toEqual(["command:new"]);
-    expect(moltbot?.requires?.config).toEqual(["workspace.dir"]);
-    expect(moltbot?.install?.[0].kind).toBe("bundled");
+    const zagent = resolveZAgentMetadata(frontmatter);
+    expect(zagent).toBeDefined();
+    expect(zagent?.emoji).toBe("💾");
+    expect(zagent?.events).toEqual(["command:new"]);
+    expect(zagent?.requires?.config).toEqual(["workspace.dir"]);
+    expect(zagent?.install?.[0].kind).toBe("bundled");
   });
 
   it("parses YAML metadata map", () => {
     const content = `---
 name: yaml-metadata
 metadata:
-  moltbot:
+  zagent:
     emoji: disk
     events:
       - command:new
 ---
 `;
     const frontmatter = parseFrontmatter(content);
-    const moltbot = resolveMoltbotMetadata(frontmatter);
-    expect(moltbot?.emoji).toBe("disk");
-    expect(moltbot?.events).toEqual(["command:new"]);
+    const zagent = resolveZAgentMetadata(frontmatter);
+    expect(zagent?.emoji).toBe("disk");
+    expect(zagent?.events).toEqual(["command:new"]);
   });
 });
 

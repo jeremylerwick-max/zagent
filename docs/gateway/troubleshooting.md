@@ -1,11 +1,11 @@
 ---
-summary: "Quick troubleshooting guide for common Moltbot failures"
+summary: "Quick troubleshooting guide for common ZAgent failures"
 read_when:
   - Investigating runtime issues or failures
 ---
 # Troubleshooting 🔧
 
-When Moltbot misbehaves, here's how to fix it.
+When ZAgent misbehaves, here's how to fix it.
 
 Start with the FAQ’s [First 60 seconds](/help/faq#first-60-seconds-if-somethings-broken) if you just want a quick triage recipe. This page goes deeper on runtime failures and diagnostics.
 
@@ -17,15 +17,15 @@ Quick triage commands (in order):
 
 | Command | What it tells you | When to use it |
 |---|---|---|
-| `moltbot status` | Local summary: OS + update, gateway reachability/mode, service, agents/sessions, provider config state | First check, quick overview |
-| `moltbot status --all` | Full local diagnosis (read-only, pasteable, safe-ish) incl. log tail | When you need to share a debug report |
-| `moltbot status --deep` | Runs gateway health checks (incl. provider probes; requires reachable gateway) | When “configured” doesn’t mean “working” |
-| `moltbot gateway probe` | Gateway discovery + reachability (local + remote targets) | When you suspect you’re probing the wrong gateway |
-| `moltbot channels status --probe` | Asks the running gateway for channel status (and optionally probes) | When gateway is reachable but channels misbehave |
-| `moltbot gateway status` | Supervisor state (launchd/systemd/schtasks), runtime PID/exit, last gateway error | When the service “looks loaded” but nothing runs |
-| `moltbot logs --follow` | Live logs (best signal for runtime issues) | When you need the actual failure reason |
+| `zagent status` | Local summary: OS + update, gateway reachability/mode, service, agents/sessions, provider config state | First check, quick overview |
+| `zagent status --all` | Full local diagnosis (read-only, pasteable, safe-ish) incl. log tail | When you need to share a debug report |
+| `zagent status --deep` | Runs gateway health checks (incl. provider probes; requires reachable gateway) | When “configured” doesn’t mean “working” |
+| `zagent gateway probe` | Gateway discovery + reachability (local + remote targets) | When you suspect you’re probing the wrong gateway |
+| `zagent channels status --probe` | Asks the running gateway for channel status (and optionally probes) | When gateway is reachable but channels misbehave |
+| `zagent gateway status` | Supervisor state (launchd/systemd/schtasks), runtime PID/exit, last gateway error | When the service “looks loaded” but nothing runs |
+| `zagent logs --follow` | Live logs (best signal for runtime issues) | When you need the actual failure reason |
 
-**Sharing output:** prefer `moltbot status --all` (it redacts tokens). If you paste `moltbot status`, consider setting `CLAWDBOT_SHOW_SECRETS=0` first (token previews).
+**Sharing output:** prefer `zagent status --all` (it redacts tokens). If you paste `zagent status`, consider setting `ZAGENT_SHOW_SECRETS=0` first (token previews).
 
 See also: [Health checks](/gateway/health) and [Logging](/logging).
 
@@ -40,13 +40,13 @@ Fix options:
 - Re-run onboarding and choose **Anthropic** for that agent.
 - Or paste a setup-token on the **gateway host**:
   ```bash
-  moltbot models auth setup-token --provider anthropic
+  zagent models auth setup-token --provider anthropic
   ```
 - Or copy `auth-profiles.json` from the main agent dir to the new agent dir.
 
 Verify:
 ```bash
-moltbot models status
+zagent models status
 ```
 
 ### OAuth token refresh failed (Anthropic Claude subscription)
@@ -59,15 +59,15 @@ switch to a **Claude Code setup-token** and paste it on the **gateway host**.
 
 ```bash
 # Run on the gateway host (paste the setup-token)
-moltbot models auth setup-token --provider anthropic
-moltbot models status
+zagent models auth setup-token --provider anthropic
+zagent models status
 ```
 
 If you generated the token elsewhere:
 
 ```bash
-moltbot models auth paste-token --provider anthropic
-moltbot models status
+zagent models auth paste-token --provider anthropic
+zagent models status
 ```
 
 More detail: [Anthropic](/providers/anthropic) and [OAuth](/concepts/oauth).
@@ -97,18 +97,18 @@ can appear “loaded” while nothing is running.
 
 **Check:**
 ```bash
-moltbot gateway status
-moltbot doctor
+zagent gateway status
+zagent doctor
 ```
 
 Doctor/service will show runtime state (PID/last exit) and log hints.
 
 **Logs:**
-- Preferred: `moltbot logs --follow`
-- File logs (always): `/tmp/moltbot/moltbot-YYYY-MM-DD.log` (or your configured `logging.file`)
-- macOS LaunchAgent (if installed): `$CLAWDBOT_STATE_DIR/logs/gateway.log` and `gateway.err.log`
-- Linux systemd (if installed): `journalctl --user -u moltbot-gateway[-<profile>].service -n 200 --no-pager`
-- Windows: `schtasks /Query /TN "Moltbot Gateway (<profile>)" /V /FO LIST`
+- Preferred: `zagent logs --follow`
+- File logs (always): `/tmp/zagent/zagent-YYYY-MM-DD.log` (or your configured `logging.file`)
+- macOS LaunchAgent (if installed): `$ZAGENT_STATE_DIR/logs/gateway.log` and `gateway.err.log`
+- Linux systemd (if installed): `journalctl --user -u zagent-gateway[-<profile>].service -n 200 --no-pager`
+- Windows: `schtasks /Query /TN "ZAgent Gateway (<profile>)" /V /FO LIST`
 
 **Enable more logging:**
 - Bump file log detail (persisted JSONL):
@@ -131,24 +131,24 @@ Gateway refuses to start.
 **Fix (recommended):**
 - Run the wizard and set the Gateway run mode to **Local**:
   ```bash
-  moltbot configure
+  zagent configure
   ```
 - Or set it directly:
   ```bash
-  moltbot config set gateway.mode local
+  zagent config set gateway.mode local
   ```
 
 **If you meant to run a remote Gateway instead:**
 - Set a remote URL and keep `gateway.mode=remote`:
   ```bash
-  moltbot config set gateway.mode remote
-  moltbot config set gateway.remote.url "wss://gateway.example.com"
+  zagent config set gateway.mode remote
+  zagent config set gateway.remote.url "wss://gateway.example.com"
   ```
 
 **Ad-hoc/dev only:** pass `--allow-unconfigured` to start the gateway without
 `gateway.mode=local`.
 
-**No config file yet?** Run `moltbot setup` to create a starter config, then rerun
+**No config file yet?** Run `zagent setup` to create a starter config, then rerun
 the gateway.
 
 ### Service Environment (PATH + runtime)
@@ -159,14 +159,14 @@ The gateway service runs with a **minimal PATH** to avoid shell/manager cruft:
 
 This intentionally excludes version managers (nvm/fnm/volta/asdf) and package
 managers (pnpm/npm) because the service does not load your shell init. Runtime
-variables like `DISPLAY` should live in `~/.clawdbot/.env` (loaded early by the
+variables like `DISPLAY` should live in `~/.zagent/.env` (loaded early by the
 gateway).
 Exec runs on `host=gateway` merge your login-shell `PATH` into the exec environment,
 so missing tools usually mean your shell init isn’t exporting them (or set
 `tools.exec.pathPrepend`). See [/tools/exec](/tools/exec).
 
 WhatsApp + Telegram channels require **Node**; Bun is unsupported. If your
-service was installed with Bun or a version-managed Node path, run `moltbot doctor`
+service was installed with Bun or a version-managed Node path, run `zagent doctor`
 to migrate to a system Node install.
 
 ### Skill missing API key in sandbox
@@ -178,7 +178,7 @@ to migrate to a system Node install.
 **Fix:**
 - set `agents.defaults.sandbox.docker.env` (or per-agent `agents.list[].sandbox.docker.env`)
 - or bake the key into your custom sandbox image
-- then run `moltbot sandbox recreate --agent <id>` (or `--all`)
+- then run `zagent sandbox recreate --agent <id>` (or `--all`)
 
 ### Service Running but Port Not Listening
 
@@ -191,28 +191,28 @@ the Gateway likely refused to bind.
 - Always trust `Probe target:` + `Config (service):` as the “what did we actually try?” lines.
 
 **Check:**
-- `gateway.mode` must be `local` for `moltbot gateway` and the service.
-- If you set `gateway.mode=remote`, the **CLI defaults** to a remote URL. The service can still be running locally, but your CLI may be probing the wrong place. Use `moltbot gateway status` to see the service’s resolved port + probe target (or pass `--url`).
-- `moltbot gateway status` and `moltbot doctor` surface the **last gateway error** from logs when the service looks running but the port is closed.
+- `gateway.mode` must be `local` for `zagent gateway` and the service.
+- If you set `gateway.mode=remote`, the **CLI defaults** to a remote URL. The service can still be running locally, but your CLI may be probing the wrong place. Use `zagent gateway status` to see the service’s resolved port + probe target (or pass `--url`).
+- `zagent gateway status` and `zagent doctor` surface the **last gateway error** from logs when the service looks running but the port is closed.
 - Non-loopback binds (`lan`/`tailnet`/`custom`, or `auto` when loopback is unavailable) require auth:
-  `gateway.auth.token` (or `CLAWDBOT_GATEWAY_TOKEN`).
+  `gateway.auth.token` (or `ZAGENT_GATEWAY_TOKEN`).
 - `gateway.remote.token` is for remote CLI calls only; it does **not** enable local auth.
 - `gateway.token` is ignored; use `gateway.auth.token`.
 
-**If `moltbot gateway status` shows a config mismatch**
+**If `zagent gateway status` shows a config mismatch**
 - `Config (cli): ...` and `Config (service): ...` should normally match.
 - If they don’t, you’re almost certainly editing one config while the service is running another.
-- Fix: rerun `moltbot gateway install --force` from the same `--profile` / `CLAWDBOT_STATE_DIR` you want the service to use.
+- Fix: rerun `zagent gateway install --force` from the same `--profile` / `ZAGENT_STATE_DIR` you want the service to use.
 
-**If `moltbot gateway status` reports service config issues**
+**If `zagent gateway status` reports service config issues**
 - The supervisor config (launchd/systemd/schtasks) is missing current defaults.
-- Fix: run `moltbot doctor` to update it (or `moltbot gateway install --force` for a full rewrite).
+- Fix: run `zagent doctor` to update it (or `zagent gateway install --force` for a full rewrite).
 
 **If `Last gateway error:` mentions “refusing to bind … without auth”**
 - You set `gateway.bind` to a non-loopback mode (`lan`/`tailnet`/`custom`, or `auto` when loopback is unavailable) but didn’t configure auth.
-- Fix: set `gateway.auth.mode` + `gateway.auth.token` (or export `CLAWDBOT_GATEWAY_TOKEN`) and restart the service.
+- Fix: set `gateway.auth.mode` + `gateway.auth.token` (or export `ZAGENT_GATEWAY_TOKEN`) and restart the service.
 
-**If `moltbot gateway status` says `bind=tailnet` but no tailnet interface was found**
+**If `zagent gateway status` says `bind=tailnet` but no tailnet interface was found**
 - The gateway tried to bind to a Tailscale IP (100.64.0.0/10) but none were detected on the host.
 - Fix: bring up Tailscale on that machine (or change `gateway.bind` to `loopback`/`lan`).
 
@@ -226,7 +226,7 @@ This means something is already listening on the gateway port.
 
 **Check:**
 ```bash
-moltbot gateway status
+zagent gateway status
 ```
 
 It will show the listener(s) and likely causes (gateway already running, SSH tunnel).
@@ -234,7 +234,7 @@ If needed, stop the service or pick a different port.
 
 ### Extra Workspace Folders Detected
 
-If you upgraded from older installs, you might still have `~/moltbot` on disk.
+If you upgraded from older installs, you might still have `~/zagent` on disk.
 Multiple workspace directories can cause confusing auth or state drift because
 only one workspace is active.
 
@@ -243,7 +243,7 @@ only one workspace is active.
 
 ### Main chat running in a sandbox workspace
 
-Symptoms: `pwd` or file tools show `~/.clawdbot/sandboxes/...` even though you
+Symptoms: `pwd` or file tools show `~/.zagent/sandboxes/...` even though you
 expected the host workspace.
 
 **Why:** `agents.defaults.sandbox.mode: "non-main"` keys off `session.mainKey` (default `"main"`).
@@ -267,14 +267,14 @@ The agent was interrupted mid-response.
 
 ### "Agent failed before reply: Unknown model: anthropic/claude-haiku-3-5"
 
-Moltbot intentionally rejects **older/insecure models** (especially those more
+ZAgent intentionally rejects **older/insecure models** (especially those more
 vulnerable to prompt injection). If you see this error, the model name is no
 longer supported.
 
 **Fix:**
 - Pick a **latest** model for the provider and update your config or model alias.
-- If you’re unsure which models are available, run `moltbot models list` or
-  `moltbot models scan` and choose a supported one.
+- If you’re unsure which models are available, run `zagent models list` or
+  `zagent models scan` and choose a supported one.
 - Check gateway logs for the detailed failure reason.
 
 See also: [Models CLI](/cli/models) and [Model providers](/concepts/model-providers).
@@ -283,7 +283,7 @@ See also: [Models CLI](/cli/models) and [Model providers](/concepts/model-provid
 
 **Check 1:** Is the sender allowlisted?
 ```bash
-moltbot status
+zagent status
 ```
 Look for `AllowFrom: ...` in the output.
 
@@ -292,14 +292,14 @@ Look for `AllowFrom: ...` in the output.
 # The message must match mentionPatterns or explicit mentions; defaults live in channel groups/guilds.
 # Multi-agent: `agents.list[].groupChat.mentionPatterns` overrides global patterns.
 grep -n "agents\\|groupChat\\|mentionPatterns\\|channels\\.whatsapp\\.groups\\|channels\\.telegram\\.groups\\|channels\\.imessage\\.groups\\|channels\\.discord\\.guilds" \
-  "${CLAWDBOT_CONFIG_PATH:-$HOME/.clawdbot/moltbot.json}"
+  "${ZAGENT_CONFIG_PATH:-$HOME/.zagent/zagent.json}"
 ```
 
 **Check 3:** Check the logs
 ```bash
-moltbot logs --follow
+zagent logs --follow
 # or if you want quick filters:
-tail -f "$(ls -t /tmp/moltbot/moltbot-*.log | head -1)" | grep "blocked\\|skip\\|unauthorized"
+tail -f "$(ls -t /tmp/zagent/zagent-*.log | head -1)" | grep "blocked\\|skip\\|unauthorized"
 ```
 
 ### Pairing Code Not Arriving
@@ -308,14 +308,14 @@ If `dmPolicy` is `pairing`, unknown senders should receive a code and their mess
 
 **Check 1:** Is a pending request already waiting?
 ```bash
-moltbot pairing list <channel>
+zagent pairing list <channel>
 ```
 
 Pending DM pairing requests are capped at **3 per channel** by default. If the list is full, new requests won’t generate a code until one is approved or expires.
 
 **Check 2:** Did the request get created but no reply was sent?
 ```bash
-moltbot logs --follow | grep "pairing request"
+zagent logs --follow | grep "pairing request"
 ```
 
 **Check 3:** Confirm `dmPolicy` isn’t `open`/`allowlist` for that channel.
@@ -332,7 +332,7 @@ Known issue: When you send an image with ONLY a mention (no other text), WhatsAp
 
 **Check 1:** Is the session file there?
 ```bash
-ls -la ~/.clawdbot/agents/<agentId>/sessions/
+ls -la ~/.zagent/agents/<agentId>/sessions/
 ```
 
 **Check 2:** Is the reset window too short?
@@ -368,26 +368,26 @@ Or use the `process` tool to background long commands.
 
 ```bash
 # Check local status (creds, sessions, queued events)
-moltbot status
+zagent status
 # Probe the running gateway + channels (WA connect + Telegram + Discord APIs)
-moltbot status --deep
+zagent status --deep
 
 # View recent connection events
-moltbot logs --limit 200 | grep "connection\\|disconnect\\|logout"
+zagent logs --limit 200 | grep "connection\\|disconnect\\|logout"
 ```
 
 **Fix:** Usually reconnects automatically once the Gateway is running. If you’re stuck, restart the Gateway process (however you supervise it), or run it manually with verbose output:
 
 ```bash
-moltbot gateway --verbose
+zagent gateway --verbose
 ```
 
 If you’re logged out / unlinked:
 
 ```bash
-moltbot channels logout
-trash "${CLAWDBOT_STATE_DIR:-$HOME/.clawdbot}/credentials" # if logout can't cleanly remove everything
-moltbot channels login --verbose       # re-scan QR
+zagent channels logout
+trash "${ZAGENT_STATE_DIR:-$HOME/.zagent}/credentials" # if logout can't cleanly remove everything
+zagent channels login --verbose       # re-scan QR
 ```
 
 ### Media Send Failing
@@ -404,12 +404,12 @@ ls -la /path/to/your/image.jpg
 
 **Check 3:** Check media logs
 ```bash
-grep "media\\|fetch\\|download" "$(ls -t /tmp/moltbot/moltbot-*.log | head -1)" | tail -20
+grep "media\\|fetch\\|download" "$(ls -t /tmp/zagent/zagent-*.log | head -1)" | tail -20
 ```
 
 ### High Memory Usage
 
-Moltbot keeps conversation history in memory.
+ZAgent keeps conversation history in memory.
 
 **Fix:** Restart periodically or set session limits:
 ```json
@@ -424,26 +424,26 @@ Moltbot keeps conversation history in memory.
 
 ### “Gateway won’t start — configuration invalid”
 
-Moltbot now refuses to start when the config contains unknown keys, malformed values, or invalid types.
+ZAgent now refuses to start when the config contains unknown keys, malformed values, or invalid types.
 This is intentional for safety.
 
 Fix it with Doctor:
 ```bash
-moltbot doctor
-moltbot doctor --fix
+zagent doctor
+zagent doctor --fix
 ```
 
 Notes:
-- `moltbot doctor` reports every invalid entry.
-- `moltbot doctor --fix` applies migrations/repairs and rewrites the config.
-- Diagnostic commands like `moltbot logs`, `moltbot health`, `moltbot status`, `moltbot gateway status`, and `moltbot gateway probe` still run even if the config is invalid.
+- `zagent doctor` reports every invalid entry.
+- `zagent doctor --fix` applies migrations/repairs and rewrites the config.
+- Diagnostic commands like `zagent logs`, `zagent health`, `zagent status`, `zagent gateway status`, and `zagent gateway probe` still run even if the config is invalid.
 
 ### “All models failed” — what should I check first?
 
 - **Credentials** present for the provider(s) being tried (auth profiles + env vars).
 - **Model routing**: confirm `agents.defaults.model.primary` and fallbacks are models you can access.
-- **Gateway logs** in `/tmp/moltbot/…` for the exact provider error.
-- **Model status**: use `/model status` (chat) or `moltbot models status` (CLI).
+- **Gateway logs** in `/tmp/zagent/…` for the exact provider error.
+- **Model status**: use `/model status` (chat) or `zagent models status` (CLI).
 
 ### I’m running on my personal WhatsApp number — why is self-chat weird?
 
@@ -468,13 +468,13 @@ See [WhatsApp setup](/channels/whatsapp).
 Run the login command again and scan the QR code:
 
 ```bash
-moltbot channels login
+zagent channels login
 ```
 
 ### Build errors on `main` — what’s the standard fix path?
 
 1) `git pull origin main && pnpm install`
-2) `moltbot doctor`
+2) `zagent doctor`
 3) Check GitHub issues or Discord
 4) Temporary workaround: check out an older commit
 
@@ -488,8 +488,8 @@ Typical recovery:
 git status   # ensure you’re in the repo root
 pnpm install
 pnpm build
-moltbot doctor
-moltbot gateway restart
+zagent doctor
+zagent gateway restart
 ```
 
 Why: pnpm is the configured package manager for this repo.
@@ -513,8 +513,8 @@ Notes:
 - The git flow only rebases if the repo is clean. Commit or stash changes first.
 - After switching, run:
   ```bash
-  moltbot doctor
-  moltbot gateway restart
+  zagent doctor
+  zagent gateway restart
   ```
 
 ### Telegram block streaming isn’t splitting text between tool calls. Why?
@@ -546,19 +546,19 @@ Fix checklist:
 3) Put `requireMention: false` **under** `channels.discord.guilds` (global or per‑channel).
    Top‑level `channels.discord.requireMention` is not a supported key.
 4) Ensure the bot has **Message Content Intent** and channel permissions.
-5) Run `moltbot channels status --probe` for audit hints.
+5) Run `zagent channels status --probe` for audit hints.
 
 Docs: [Discord](/channels/discord), [Channels troubleshooting](/channels/troubleshooting).
 
 ### Cloud Code Assist API error: invalid tool schema (400). What now?
 
 This is almost always a **tool schema compatibility** issue. The Cloud Code Assist
-endpoint accepts a strict subset of JSON Schema. Moltbot scrubs/normalizes tool
+endpoint accepts a strict subset of JSON Schema. ZAgent scrubs/normalizes tool
 schemas in current `main`, but the fix is not in the last release yet (as of
 January 13, 2026).
 
 Fix checklist:
-1) **Update Moltbot**:
+1) **Update ZAgent**:
    - If you can run from source, pull `main` and restart the gateway.
    - Otherwise, wait for the next release that includes the schema scrubber.
 2) Avoid unsupported keywords like `anyOf/oneOf/allOf`, `patternProperties`,
@@ -580,7 +580,7 @@ tccutil reset All bot.molt.mac.debug
 ```
 
 **Fix 2: Force New Bundle ID**
-If resetting doesn't work, change the `BUNDLE_ID` in [`scripts/package-mac-app.sh`](https://github.com/moltbot/moltbot/blob/main/scripts/package-mac-app.sh) (e.g., add a `.test` suffix) and rebuild. This forces macOS to treat it as a new app.
+If resetting doesn't work, change the `BUNDLE_ID` in [`scripts/package-mac-app.sh`](https://github.com/zagent/zagent/blob/main/scripts/package-mac-app.sh) (e.g., add a `.test` suffix) and rebuild. This forces macOS to treat it as a new app.
 
 ### Gateway stuck on "Starting..."
 
@@ -589,9 +589,9 @@ The app connects to a local gateway on port `18789`. If it stays stuck:
 **Fix 1: Stop the supervisor (preferred)**
 If the gateway is supervised by launchd, killing the PID will just respawn it. Stop the supervisor first:
 ```bash
-moltbot gateway status
-moltbot gateway stop
-# Or: launchctl bootout gui/$UID/bot.molt.gateway (replace with bot.molt.<profile>; legacy com.clawdbot.* still works)
+zagent gateway status
+zagent gateway stop
+# Or: launchctl bootout gui/$UID/bot.molt.gateway (replace with bot.molt.<profile>; legacy com.zagent.* still works)
 ```
 
 **Fix 2: Port is busy (find the listener)**
@@ -607,10 +607,10 @@ kill -9 <PID> # last resort
 ```
 
 **Fix 3: Check the CLI install**
-Ensure the global `moltbot` CLI is installed and matches the app version:
+Ensure the global `zagent` CLI is installed and matches the app version:
 ```bash
-moltbot --version
-npm install -g moltbot@<version>
+zagent --version
+npm install -g zagent@<version>
 ```
 
 ## Debug Mode
@@ -619,43 +619,43 @@ Get verbose logging:
 
 ```bash
 # Turn on trace logging in config:
-#   ${CLAWDBOT_CONFIG_PATH:-$HOME/.clawdbot/moltbot.json} -> { logging: { level: "trace" } }
+#   ${ZAGENT_CONFIG_PATH:-$HOME/.zagent/zagent.json} -> { logging: { level: "trace" } }
 #
 # Then run verbose commands to mirror debug output to stdout:
-moltbot gateway --verbose
-moltbot channels login --verbose
+zagent gateway --verbose
+zagent channels login --verbose
 ```
 
 ## Log Locations
 
 | Log | Location |
 |-----|----------|
-| Gateway file logs (structured) | `/tmp/moltbot/moltbot-YYYY-MM-DD.log` (or `logging.file`) |
-| Gateway service logs (supervisor) | macOS: `$CLAWDBOT_STATE_DIR/logs/gateway.log` + `gateway.err.log` (default: `~/.clawdbot/logs/...`; profiles use `~/.clawdbot-<profile>/logs/...`)<br />Linux: `journalctl --user -u moltbot-gateway[-<profile>].service -n 200 --no-pager`<br />Windows: `schtasks /Query /TN "Moltbot Gateway (<profile>)" /V /FO LIST` |
-| Session files | `$CLAWDBOT_STATE_DIR/agents/<agentId>/sessions/` |
-| Media cache | `$CLAWDBOT_STATE_DIR/media/` |
-| Credentials | `$CLAWDBOT_STATE_DIR/credentials/` |
+| Gateway file logs (structured) | `/tmp/zagent/zagent-YYYY-MM-DD.log` (or `logging.file`) |
+| Gateway service logs (supervisor) | macOS: `$ZAGENT_STATE_DIR/logs/gateway.log` + `gateway.err.log` (default: `~/.zagent/logs/...`; profiles use `~/.zagent-<profile>/logs/...`)<br />Linux: `journalctl --user -u zagent-gateway[-<profile>].service -n 200 --no-pager`<br />Windows: `schtasks /Query /TN "ZAgent Gateway (<profile>)" /V /FO LIST` |
+| Session files | `$ZAGENT_STATE_DIR/agents/<agentId>/sessions/` |
+| Media cache | `$ZAGENT_STATE_DIR/media/` |
+| Credentials | `$ZAGENT_STATE_DIR/credentials/` |
 
 ## Health Check
 
 ```bash
 # Supervisor + probe target + config paths
-moltbot gateway status
+zagent gateway status
 # Include system-level scans (legacy/extra services, port listeners)
-moltbot gateway status --deep
+zagent gateway status --deep
 
 # Is the gateway reachable?
-moltbot health --json
+zagent health --json
 # If it fails, rerun with connection details:
-moltbot health --verbose
+zagent health --verbose
 
 # Is something listening on the default port?
 lsof -nP -iTCP:18789 -sTCP:LISTEN
 
 # Recent activity (RPC log tail)
-moltbot logs --follow
+zagent logs --follow
 # Fallback if RPC is down
-tail -20 /tmp/moltbot/moltbot-*.log
+tail -20 /tmp/zagent/zagent-*.log
 ```
 
 ## Reset Everything
@@ -663,23 +663,23 @@ tail -20 /tmp/moltbot/moltbot-*.log
 Nuclear option:
 
 ```bash
-moltbot gateway stop
+zagent gateway stop
 # If you installed a service and want a clean install:
-# moltbot gateway uninstall
+# zagent gateway uninstall
 
-trash "${CLAWDBOT_STATE_DIR:-$HOME/.clawdbot}"
-moltbot channels login         # re-pair WhatsApp
-moltbot gateway restart           # or: moltbot gateway
+trash "${ZAGENT_STATE_DIR:-$HOME/.zagent}"
+zagent channels login         # re-pair WhatsApp
+zagent gateway restart           # or: zagent gateway
 ```
 
 ⚠️ This loses all sessions and requires re-pairing WhatsApp.
 
 ## Getting Help
 
-1. Check logs first: `/tmp/moltbot/` (default: `moltbot-YYYY-MM-DD.log`, or your configured `logging.file`)
+1. Check logs first: `/tmp/zagent/` (default: `zagent-YYYY-MM-DD.log`, or your configured `logging.file`)
 2. Search existing issues on GitHub
 3. Open a new issue with:
-   - Moltbot version
+   - ZAgent version
    - Relevant log snippets
    - Steps to reproduce
    - Your config (redact secrets!)

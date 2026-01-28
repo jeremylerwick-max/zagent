@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/nostr",
+  "name": "@zagent/nostr",
   "version": "2026.1.27-beta.1",
   "type": "module",
-  "description": "Moltbot Nostr channel plugin for NIP-04 encrypted DMs",
-  "moltbot": {
+  "description": "ZAgent Nostr channel plugin for NIP-04 encrypted DMs",
+  "zagent": {
     "extensions": [
       "./index.ts"
     ],
@@ -18,13 +18,13 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@moltbot/nostr",
+      "npmSpec": "@zagent/nostr",
       "localPath": "extensions/nostr",
       "defaultChoice": "npm"
     }
   },
   "dependencies": {
-    "moltbot": "workspace:*",
+    "zagent": "workspace:*",
     "nostr-tools": "^2.20.0",
     "zod": "^4.3.6"
   }

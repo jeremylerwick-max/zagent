@@ -1,6 +1,6 @@
-# @clawdbot/voice-call
+# @zagent/voice-call
 
-Official Voice Call plugin for **Clawdbot**.
+Official Voice Call plugin for **ZAgent**.
 
 Providers:
 - **Twilio** (Programmable Voice + Media Streams)
@@ -13,10 +13,10 @@ Plugin system: `https://docs.molt.bot/plugin`
 
 ## Install (local dev)
 
-### Option A: install via Clawdbot (recommended)
+### Option A: install via ZAgent (recommended)
 
 ```bash
-clawdbot plugins install @clawdbot/voice-call
+zagent plugins install @zagent/voice-call
 ```
 
 Restart the Gateway afterwards.
@@ -24,9 +24,9 @@ Restart the Gateway afterwards.
 ### Option B: copy into your global extensions folder (dev)
 
 ```bash
-mkdir -p ~/.clawdbot/extensions
-cp -R extensions/voice-call ~/.clawdbot/extensions/voice-call
-cd ~/.clawdbot/extensions/voice-call && pnpm install
+mkdir -p ~/.zagent/extensions
+cp -R extensions/voice-call ~/.zagent/extensions/voice-call
+cd ~/.zagent/extensions/voice-call && pnpm install
 ```
 
 ## Config
@@ -100,13 +100,13 @@ Notes:
 ## CLI
 
 ```bash
-clawdbot voicecall call --to "+15555550123" --message "Hello from Clawdbot"
-clawdbot voicecall continue --call-id <id> --message "Any questions?"
-clawdbot voicecall speak --call-id <id> --message "One moment"
-clawdbot voicecall end --call-id <id>
-clawdbot voicecall status --call-id <id>
-clawdbot voicecall tail
-clawdbot voicecall expose --mode funnel
+zagent voicecall call --to "+15555550123" --message "Hello from ZAgent"
+zagent voicecall continue --call-id <id> --message "Any questions?"
+zagent voicecall speak --call-id <id> --message "One moment"
+zagent voicecall end --call-id <id>
+zagent voicecall status --call-id <id>
+zagent voicecall tail
+zagent voicecall expose --mode funnel
 ```
 
 ## Tool

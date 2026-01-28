@@ -1,9 +1,9 @@
 ---
-summary: "Schema-accurate configuration examples for common Moltbot setups"
+summary: "Schema-accurate configuration examples for common ZAgent setups"
 read_when:
-  - Learning how to configure Moltbot
+  - Learning how to configure ZAgent
   - Looking for configuration examples
-  - Setting up Moltbot for the first time
+  - Setting up ZAgent for the first time
 ---
 # Configuration Examples
 
@@ -19,7 +19,7 @@ Examples below are aligned with the current config schema. For the exhaustive re
 }
 ```
 
-Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
+Save to `~/.zagent/zagent.json` and you can DM the bot from that number.
 
 ### Recommended starter
 ```json5
@@ -85,7 +85,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
   // Logging
   logging: {
     level: "info",
-    file: "/tmp/moltbot/moltbot.log",
+    file: "/tmp/zagent/zagent.log",
     consoleLevel: "info",
     consoleStyle: "pretty",
     redactSensitive: "tools"
@@ -93,7 +93,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
 
   // Message formatting
   messages: {
-    messagePrefix: "[moltbot]",
+    messagePrefix: "[zagent]",
     responsePrefix: ">",
     ackReaction: "👀",
     ackReactionScope: "group-mentions"
@@ -102,7 +102,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
   // Routing + queue
   routing: {
     groupChat: {
-      mentionPatterns: ["@clawd", "moltbot"],
+      mentionPatterns: ["@clawd", "zagent"],
       historyLimit: 50
     },
     queue: {
@@ -155,7 +155,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
       discord: { mode: "idle", idleMinutes: 10080 }
     },
     resetTriggers: ["/new", "/reset"],
-    store: "~/.clawdbot/agents/default/sessions/sessions.json",
+    store: "~/.zagent/agents/default/sessions/sessions.json",
     typingIntervalSeconds: 5,
     sendPolicy: {
       default: "allow",
@@ -272,9 +272,9 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
       sandbox: {
         mode: "non-main",
         perSession: true,
-        workspaceRoot: "~/.clawdbot/sandboxes",
+        workspaceRoot: "~/.zagent/sandboxes",
         docker: {
-          image: "moltbot-sandbox:bookworm-slim",
+          image: "zagent-sandbox:bookworm-slim",
           workdir: "/workspace",
           readOnlyRoot: true,
           tmpfs: ["/tmp", "/var/tmp", "/run"],
@@ -339,7 +339,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
   // Cron jobs
   cron: {
     enabled: true,
-    store: "~/.clawdbot/cron/cron.json",
+    store: "~/.zagent/cron/cron.json",
     maxConcurrentRuns: 2
   },
 
@@ -349,7 +349,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
     path: "/hooks",
     token: "shared-secret",
     presets: ["gmail"],
-    transformsDir: "~/.clawdbot/hooks",
+    transformsDir: "~/.zagent/hooks",
     mappings: [
       {
         id: "gmail-hook",
@@ -369,7 +369,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
       }
     ],
     gmail: {
-      account: "moltbot@gmail.com",
+      account: "zagent@gmail.com",
       label: "INBOX",
       topic: "projects/<project-id>/topics/gog-gmail-watch",
       subscription: "gog-gmail-watch-push",
@@ -388,7 +388,7 @@ Save to `~/.clawdbot/moltbot.json` and you can DM the bot from that number.
     mode: "local",
     port: 18789,
     bind: "loopback",
-    controlUi: { enabled: true, basePath: "/moltbot" },
+    controlUi: { enabled: true, basePath: "/zagent" },
     auth: {
       mode: "token",
       token: "gateway-token",

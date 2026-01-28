@@ -1,9 +1,9 @@
 {
-  "name": "@moltbot/signal",
+  "name": "@zagent/signal",
   "version": "2026.1.27-beta.1",
   "type": "module",
-  "description": "Moltbot Signal channel plugin",
-  "moltbot": {
+  "description": "ZAgent Signal channel plugin",
+  "zagent": {
     "extensions": [
       "./index.ts"
     ]

@@ -7,6 +7,7 @@ Create Date: 2026-02-02
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+from pgvector.sqlalchemy import Vector
 
 revision = "20260202_0002"
 down_revision = "20260202_0001"
@@ -24,7 +25,7 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("chunk_index", sa.Integer(), nullable=False),
         sa.Column("chunk_text", sa.Text(), nullable=False),
-        sa.Column("embedding", sa.text("vector(768)"), nullable=False),  # nomic-embed-text = 768 dim
+        sa.Column("embedding", Vector(768), nullable=False),  # nomic-embed-text = 768 dim
     )
     op.create_index("uq_source_embedding_chunk", "source_embedding", ["source_id", "chunk_index"], unique=True)
     op.create_index("idx_source_embedding_job", "source_embedding", ["job_id"], unique=False)

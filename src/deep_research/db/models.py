@@ -99,6 +99,7 @@ class SourceCitation(Base):
     __table_args__ = (
         Index("idx_source_citation_job", "job_id"),
         Index("idx_source_citation_source", "source_id"),
+        Index("uq_source_citation_dedup", "source_id", "quote", "location", unique=True),
     )
 
 
@@ -147,4 +148,18 @@ class SourceEmbedding(Base):
     __table_args__ = (
         Index("uq_source_embedding_chunk", "source_id", "chunk_index", unique=True),
         Index("idx_source_embedding_job", "job_id"),
+    )
+
+
+class ClaimCitationLink(Base):
+    __tablename__ = "claim_citation_link"
+    claim_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("source_claim.claim_id", ondelete="CASCADE"), primary_key=True,
+    )
+    citation_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("source_citation.citation_id", ondelete="CASCADE"), primary_key=True,
+    )
+    __table_args__ = (
+        Index("idx_claim_citation_link_claim", "claim_id"),
+        Index("idx_claim_citation_link_citation", "citation_id"),
     )

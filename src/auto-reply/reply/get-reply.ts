@@ -23,6 +23,7 @@ import { initSessionState } from "./session.js";
 import { applyResetModelOverride } from "./session-reset-model.js";
 import { stageSandboxMedia } from "./stage-sandbox-media.js";
 import { createTypingController } from "./typing.js";
+import { resolveRoutedModel, formatTierBadge } from "../../model-router/integration.js";
 
 export async function getReplyFromConfig(
   ctx: MsgContext,
@@ -46,6 +47,18 @@ export async function getReplyFromConfig(
   });
   let provider = defaultProvider;
   let model = defaultModel;
+
+  // ── Zileas Model Router: classify query and pick optimal model ──
+  if (!opts?.isHeartbeat && ctx.Body) {
+    const routed = resolveRoutedModel(ctx.Body, provider, model);
+    if (routed) {
+      provider = routed.provider;
+      model = routed.model;
+      const badge = formatTierBadge(routed.decision);
+      defaultRuntime.log?.(`[model-router] ${badge}`);
+    }
+  }
+
   if (opts?.isHeartbeat) {
     const heartbeatRaw = agentCfg?.heartbeat?.model?.trim() ?? "";
     const heartbeatRef = heartbeatRaw

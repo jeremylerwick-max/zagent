@@ -1,75 +1,78 @@
 /**
- * Zileas Router Integration Hook
- * Intercepts model selection in get-reply.ts to use query-based routing
- *
- * Usage: Called after resolveDefaultModel() to override provider/model
- * based on query classification
+ * Zileas Model Router — Gateway Integration
+ * Bridges the router into OpenClaw's model selection pipeline
  */
 
-import { routeQuery } from "./router.js";
-import type { RoutingDecision } from "./types.js";
+import { routeQuery, type RoutingDecision, type Tier } from "./router.js";
 
-// Cache the last routing decision for the response badge
-let lastDecision: RoutingDecision | null = null;
-
-export function getLastRoutingDecision(): RoutingDecision | null {
-  return lastDecision;
+export interface RoutedModel {
+  provider: string;
+  model: string;
+  decision: RoutingDecision;
 }
 
 /**
- * Given a user message, classify and return the optimal model.
- * Returns null if routing is disabled or no override needed.
+ * Called from get-reply.ts on every incoming message.
+ * Classifies the query and returns the optimal model.
+ * Returns null if routing is disabled or query is empty.
  */
 export function resolveRoutedModel(
-  userMessage: string,
+  query: string | undefined,
   currentProvider: string,
   currentModel: string,
-  overrideModel?: string,
-): { provider: string; model: string; decision: RoutingDecision } | null {
-  // Skip routing for empty messages
-  if (!userMessage || userMessage.trim().length === 0) return null;
+): RoutedModel | null {
+  if (!query || query.trim().length === 0) return null;
 
-  // Skip routing if user explicitly forced a model via /model command
-  // (overrideModel is set by the command handler)
-  if (overrideModel) {
-    const decision = routeQuery(userMessage, overrideModel);
-    lastDecision = decision;
+  // Skip routing for system/internal messages
+  if (query.startsWith("/") || query.startsWith("!")) return null;
+
+  try {
+    const decision = routeQuery(query);
+    const selected = decision.actualModel;
+
+    // Map our provider names to OpenClaw provider format
+    const providerMap: Record<string, string> = {
+      ollama: "ollama",
+      anthropic: "anthropic",
+      openai: "openai",
+      google: "google",
+      openrouter: "openrouter",
+    };
+
     return {
-      provider: decision.actualModel.provider,
-      model: decision.actualModel.model,
+      provider: providerMap[selected.provider] ?? currentProvider,
+      model: selected.model,
       decision,
     };
+  } catch (err) {
+    // If classifier fails, fall through to default model
+    console.error("[model-router] Classification error:", err);
+    return null;
   }
-
-  const decision = routeQuery(userMessage);
-  lastDecision = decision;
-
-  // Format for the gateway's provider/model system
-  // The gateway uses "ollama" as provider name
-  return {
-    provider: decision.actualModel.provider,
-    model: decision.actualModel.model,
-    decision,
-  };
 }
 
 /**
- * Format a tier badge for display in responses
+ * Format a tier badge for logging / UI display
  */
 export function formatTierBadge(decision: RoutingDecision): string {
-  const tierLabels: Record<string, string> = {
+  const tierEmoji: Record<Tier, string> = {
     elementary: "⚡",
     "high-school": "📝",
     college: "🔧",
     masters: "🏗️",
     phd: "🧠",
   };
-  const icon = tierLabels[decision.classification.tier] ?? "❓";
+
+  const emoji = tierEmoji[decision.classification.tier] ?? "❓";
+  const tier = decision.classification.tier;
+  const conf = (decision.classification.confidence * 100).toFixed(0);
   const model = `${decision.actualModel.provider}/${decision.actualModel.model}`;
-  const via = decision.usedFallback ? ` (fallback: ${decision.fallbackReason})` : "";
+  const ms = decision.classification.classificationTimeMs;
+  const fallback = decision.usedFallback ? ` (fallback: ${decision.fallbackReason})` : "";
   const cost =
     decision.apiCostEstimate && decision.apiCostEstimate > 0
-      ? ` · $${decision.apiCostEstimate.toFixed(4)}`
+      ? ` [$${decision.apiCostEstimate.toFixed(4)}]`
       : "";
-  return `${icon} ${decision.classification.tier}${via} · ${model}${cost}`;
+
+  return `${emoji} ${tier} (${conf}%) → ${model} ${ms}ms${fallback}${cost}`;
 }
